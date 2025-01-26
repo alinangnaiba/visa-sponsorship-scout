@@ -1,0 +1,47 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Migrator.Application.Services;
+
+namespace Migrator.API.Controllers
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    public class OrganisationController : ControllerBase
+    {
+        private readonly IDataRetriever _dataRetriever;
+        private readonly IDataUploader _dataUploader;
+
+        public OrganisationController(IDataRetriever dataRetriever, IDataUploader dataUploader)
+        {
+            _dataRetriever = dataRetriever;
+            _dataUploader = dataUploader;
+        }
+
+        [HttpGet("county/{county}")]
+        public async Task<IActionResult> GetByCounty(string county)
+        {
+            var result = await _dataRetriever.GetOrganisationByCountyAsync(county);
+            return Ok(new {Data = result, Total = result.Count, Successful = true });
+        }
+
+        [HttpGet("town-or-city/{townOrCity}")]
+        public async Task<IActionResult> GetByTownOrCity(string townOrCity)
+        {
+            var result = await _dataRetriever.GetOrganisationByTownCityAsync(townOrCity);
+            return Ok(new { Data = result, Total = result.Count, Successful = true });
+        }
+
+        [HttpGet("name/{name}")]
+        public async Task<IActionResult> GetByName(string name)
+        {
+            var result = await _dataRetriever.GetOrganisationByNameAsync(name);
+            return Ok(new { Data = result, Total = result.Count, Successful = true });
+        }
+
+        [HttpPost("upload")]
+        public async Task<IActionResult> Post(IFormFile file)
+        {
+            var totalChanges = await _dataUploader.SaveAsync(file);
+            return Ok($"Total changes: {totalChanges}");
+        }
+    }
+}

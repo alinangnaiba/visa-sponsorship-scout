@@ -1,5 +1,5 @@
 using Migrator.Application.Services;
-using Raven.Client.Documents;
+using Migrator.Infrastructure.Extensions;
 
 namespace Migrator
 {
@@ -10,21 +10,7 @@ namespace Migrator
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddSingleton<IDocumentStore>(provider =>
-            {
-                var store = new DocumentStore
-                {
-                    Urls = new[] { "http://localhost:8080" }, // Replace with your RavenDB server URL
-                    Database = "Migrator"            // Database name
-                };
-                store.Initialize();
-                return store;
-            });
-            builder.Services.AddScoped(provider =>
-            {
-                var store = provider.GetRequiredService<IDocumentStore>();
-                return store.OpenAsyncSession(); // Scoped session for each request
-            });
+            builder.Services.ConfigureDatabase(builder.Configuration);
 
             builder.Services.AddScoped<IDataUploader, DataUploader>();
             builder.Services.AddScoped<IDataRetriever, DataRetriever>();

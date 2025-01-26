@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Migrator.Application\Migrator.Application.csproj" />
+    <ProjectReference Include="..\Migrator.Infrastructure\Migrator.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

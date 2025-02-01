@@ -23,32 +23,31 @@ namespace Migrator.Infrastructure.AzureServices
                 ExcludeVisualStudioCredential = true,
                 ExcludeSharedTokenCacheCredential = true
             });
-            try
-            {
-                var token = credential.GetToken(new Azure.Core.TokenRequestContext(new[] { "https://storage.azure.com/.default" }));
-                Console.WriteLine($"✅ Managed Identity Authentication Succeeded! Token Expires: {token.ExpiresOn}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"❌ Managed Identity Authentication Failed: {ex.Message}");
-            }
-
-            //ShareClient share = new ShareClient(new Uri(_settings.Uri), credential);
-            //ShareDirectoryClient client = share.GetDirectoryClient(_settings.CertificateDirectoryName);
-            //var list = client.GetFilesAndDirectories().ToList();
-            //var fileItem = list.FirstOrDefault(file => !file.IsDirectory && file.Name == fileName);
-            //if (fileItem is null) 
+            //try
             //{
-            //    return null;
+            //    var token = credential.GetToken(new Azure.Core.TokenRequestContext(new[] { "https://storage.azure.com/.default" }));
+            //    Console.WriteLine($"✅ Managed Identity Authentication Succeeded! Token Expires: {token.ExpiresOn}");
             //}
-            //ShareFileClient file = client.GetFileClient(fileItem.Name);
-            //ShareFileDownloadInfo download = file.Download();
-            //using MemoryStream ms = new MemoryStream();
-            //download.Content.CopyTo(ms);
-            //ms.Position = 0;
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine($"❌ Managed Identity Authentication Failed: {ex.Message}");
+            //}
 
-            //return ms.ToArray();
-            return null;
+            ShareClient share = new ShareClient(new Uri(_settings.Uri), credential);
+            ShareDirectoryClient client = share.GetDirectoryClient(_settings.CertificateDirectoryName);
+            var list = client.GetFilesAndDirectories().ToList();
+            var fileItem = list.FirstOrDefault(file => !file.IsDirectory && file.Name == fileName);
+            if (fileItem is null)
+            {
+                return null;
+            }
+            ShareFileClient file = client.GetFileClient(fileItem.Name);
+            ShareFileDownloadInfo download = file.Download();
+            using MemoryStream ms = new MemoryStream();
+            download.Content.CopyTo(ms);
+            ms.Position = 0;
+
+            return ms.ToArray();
         }
     }
 }

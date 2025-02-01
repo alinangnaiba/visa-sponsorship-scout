@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - migrator-api
+name: Build and deploy ASP.Net Core app to Azure Web App - migrator-app-api
 
 on:
   push:
@@ -54,15 +54,15 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_D8857A6759BB42D79B47D84B2289CE12 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_774CC79C1F534B72A9135EC98A775CE2 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_7925071FF33248B8A3269153D0AA2747 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_39598AD9824D412681E0283368F81503 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_617D9E11C6EB4A5688D7508B0128F7CD }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_DE175C6770394B99A116ADC27F3F6EF3 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'migrator-api'
+          app-name: 'migrator-app-api'
           slot-name: 'Production'
           package: .
           

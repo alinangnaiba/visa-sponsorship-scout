@@ -33,21 +33,22 @@ namespace Migrator.Infrastructure.AzureServices
                 Console.WriteLine($"❌ Managed Identity Authentication Failed: {ex.Message}");
             }
 
-            ShareClient share = new ShareClient(new Uri(_settings.Uri), credential);
-            ShareDirectoryClient client = share.GetDirectoryClient(_settings.CertificateDirectoryName);
-            var list = client.GetFilesAndDirectories().ToList();
-            var fileItem = list.FirstOrDefault(file => !file.IsDirectory && file.Name == fileName);
-            if (fileItem is null) 
-            {
-                return null;
-            }
-            ShareFileClient file = client.GetFileClient(fileItem.Name);
-            ShareFileDownloadInfo download = file.Download();
-            using MemoryStream ms = new MemoryStream();
-            download.Content.CopyTo(ms);
-            ms.Position = 0;
+            //ShareClient share = new ShareClient(new Uri(_settings.Uri), credential);
+            //ShareDirectoryClient client = share.GetDirectoryClient(_settings.CertificateDirectoryName);
+            //var list = client.GetFilesAndDirectories().ToList();
+            //var fileItem = list.FirstOrDefault(file => !file.IsDirectory && file.Name == fileName);
+            //if (fileItem is null) 
+            //{
+            //    return null;
+            //}
+            //ShareFileClient file = client.GetFileClient(fileItem.Name);
+            //ShareFileDownloadInfo download = file.Download();
+            //using MemoryStream ms = new MemoryStream();
+            //download.Content.CopyTo(ms);
+            //ms.Position = 0;
 
-            return ms.ToArray();
+            //return ms.ToArray();
+            return null;
         }
     }
 }

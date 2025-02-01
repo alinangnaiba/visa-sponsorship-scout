@@ -1,4 +1,5 @@
-﻿using Azure.Storage.Files.Shares;
+﻿using Azure.Identity;
+using Azure.Storage.Files.Shares;
 using Azure.Storage.Files.Shares.Models;
 using Migrator.Infrastructure.Configuration;
 
@@ -15,7 +16,8 @@ namespace Migrator.Infrastructure.AzureServices
 
         public byte[]? GetByte(string fileName)
         {
-            ShareClient share = new ShareClient(_settings.ConnectionString, _settings.ShareName);
+            var credential = new DefaultAzureCredential();
+            ShareClient share = new ShareClient(new Uri(_settings.Uri), credential);
             ShareDirectoryClient client = share.GetDirectoryClient(_settings.CertificateDirectoryName);
             var list = client.GetFilesAndDirectories().ToList();
             var fileItem = list.FirstOrDefault(file => !file.IsDirectory && file.Name == fileName);

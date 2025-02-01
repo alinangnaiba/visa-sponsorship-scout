@@ -60,6 +60,7 @@ namespace Migrator.Infrastructure.Extensions
                 applicationSettings.AzureFileStorage.ShareName = Environment.GetEnvironmentVariable("AZURE_FILE_STORAGE_SHARE_NAME");
                 applicationSettings.AzureFileStorage.ConnectionString = Environment.GetEnvironmentVariable("AZURE_FILE_STORAGE_CONNECTION_STRING");
                 applicationSettings.AzureFileStorage.CertificateDirectoryName = Environment.GetEnvironmentVariable("AZURE_FILE_STORAGE_CERTIFICATE_DIRECTORY_NAME");
+                applicationSettings.AzureFileStorage.Uri = Environment.GetEnvironmentVariable("AZURE_FILE_STORAGE_URI");
             }
             else
             {

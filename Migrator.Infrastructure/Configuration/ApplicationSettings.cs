@@ -17,6 +17,7 @@ namespace Migrator.Infrastructure.Configuration
         public string CertificateDirectoryName { get; set; }
         public string ConnectionString { get; set; }
         public string ShareName { get; set; }
+        public string Uri { get; set; }
     }
 
     internal class RavenDbSettings

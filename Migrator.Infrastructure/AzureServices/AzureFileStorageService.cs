@@ -16,7 +16,13 @@ namespace Migrator.Infrastructure.AzureServices
 
         public byte[]? GetByte(string fileName)
         {
-            var credential = new DefaultAzureCredential();
+            var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+            {
+                ExcludeEnvironmentCredential = true,
+                ExcludeManagedIdentityCredential = false,
+                ExcludeVisualStudioCredential = true,
+                ExcludeSharedTokenCacheCredential = true
+            });
             ShareClient share = new ShareClient(new Uri(_settings.Uri), credential);
             ShareDirectoryClient client = share.GetDirectoryClient(_settings.CertificateDirectoryName);
             var list = client.GetFilesAndDirectories().ToList();

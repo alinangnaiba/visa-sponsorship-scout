@@ -4,7 +4,6 @@ using Migrator.Infrastructure.AzureServices;
 using Migrator.Infrastructure.Configuration;
 using Raven.Client.Documents;
 using System.Security.Cryptography.X509Certificates;
-using static Raven.Client.Constants;
 
 namespace Migrator.Infrastructure.Extensions
 {
@@ -20,8 +19,7 @@ namespace Migrator.Infrastructure.Extensions
                 Urls = applicationSettings.RavenDbSettings.Urls,
                 Database = applicationSettings.RavenDbSettings.DatabaseName
             };
-            if (!string.IsNullOrWhiteSpace(applicationSettings.AzureFileStorage.ConnectionString) && 
-                TryGetCertificate(applicationSettings.AzureFileStorage, applicationSettings.RavenDbSettings.CertificateFileName, out certificate))
+            if (TryGetCertificateFromStorage(applicationSettings.AzureFileStorage, applicationSettings.RavenDbSettings.CertificateFileName, out certificate))
             {
                 store.Certificate = certificate;
             }
@@ -78,7 +76,7 @@ namespace Migrator.Infrastructure.Extensions
             return applicationSettings;
         }
 
-        private static bool TryGetCertificate(AzureFileStorageSettings settings, string fileName, out X509Certificate2? certificate)
+        private static bool TryGetCertificateFromStorage(AzureFileStorageSettings settings, string fileName, out X509Certificate2? certificate)
         {
             if (string.IsNullOrWhiteSpace(settings.CertificateDirectoryName) || string.IsNullOrWhiteSpace(settings.ShareName) || string.IsNullOrWhiteSpace(fileName)) 
             {

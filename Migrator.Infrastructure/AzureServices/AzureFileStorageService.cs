@@ -44,6 +44,11 @@ namespace Migrator.Infrastructure.AzureServices
                 //{
                 //    return null;
                 //}
+                ShareFileClient txtFileClient = client.GetFileClient("test_text.txt");
+                ShareFileDownloadInfo txtdownload = txtFileClient.Download();
+                using MemoryStream txtms = new MemoryStream();
+                txtdownload.Content.CopyTo(txtms);
+
                 ShareFileClient file = client.GetFileClient(fileName);
                 ShareFileDownloadInfo download = file.Download();
                 using MemoryStream ms = new MemoryStream();

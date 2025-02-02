@@ -32,7 +32,7 @@ namespace Migrator.Application.Services
 
         public async Task<PagedResult<Organisation>> GetOrganisationByNameAsync(string name, int page = 1)
         {
-            return await FindByPagedAsync(org => org.OrganisationName == name, page);
+            return await SearchAsync(name, page);
         }
 
         public async Task<PagedResult<Organisation>> GetOrganisationByTownCityAsync(string townOrCity, int page = 1)
@@ -53,6 +53,25 @@ namespace Migrator.Application.Services
             {
                 query = query.Where(predicate);
             }
+            result.TotalResult = await query.CountAsync();
+            result.Data = await query
+                .Statistics(out var stats)
+                .Skip((page - 1) * _pageSize)
+                .Take(_pageSize)
+                .ToListAsync();
+
+            result.PageSize = _pageSize;
+            result.CurrentPage = page;
+            result.TotalPages = (int)Math.Ceiling((double)result.TotalResult / _pageSize);
+
+            return result;
+        }
+
+        private async Task<PagedResult<Organisation>> SearchAsync(string keyword, int page)
+        {
+            var result = new PagedResult<Organisation>();
+            var query = _session.Query<Organisation>();
+            query = query.Search(org => org.OrganisationName, keyword);
             result.TotalResult = await query.CountAsync();
             result.Data = await query
                 .Statistics(out var stats)

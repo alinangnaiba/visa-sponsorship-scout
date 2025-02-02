@@ -23,6 +23,7 @@ namespace Migrator.Infrastructure.AzureServices
                 {
                     ShareTokenIntent = ShareTokenIntent.Backup
                 };
+                //Not using Key Vault just coz I'm cheap
                 var shareClient = new ShareClient(new Uri($"{_settings.Uri}/{_settings.ShareName}"), new DefaultAzureCredential(), shareOptions);
                 ShareDirectoryClient client = shareClient.GetDirectoryClient(_settings.CertificateDirectoryName);
                 ShareFileClient file = client.GetFileClient(fileName);

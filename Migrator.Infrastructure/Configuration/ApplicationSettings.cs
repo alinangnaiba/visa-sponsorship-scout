@@ -18,7 +18,7 @@
     {
         public string CertificateFileName { get; set; }
         public string CertificatePath { get; set; }
-        public string DatabaseName { get; set; }
+        public string Database { get; set; }
         public string[] Urls { get; set; }
     }
 }

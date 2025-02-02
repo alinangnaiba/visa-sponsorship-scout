@@ -18,8 +18,8 @@ namespace Migrator.Infrastructure.Extensions
             // Create and configure the DocumentStore
             var store = new DocumentStore
             {
-                Urls = applicationSettings.RavenDbSettings.Urls,
-                Database = applicationSettings.RavenDbSettings.DatabaseName
+                Urls = applicationSettings.RavenDbSettings.Urls.ToArray(),
+                Database = applicationSettings.RavenDbSettings.Database
             };
             if (TryGetCertificateFromStorage(applicationSettings.AzureFileStorage, applicationSettings.RavenDbSettings.CertificateFileName, out certificate))
             {
@@ -51,19 +51,11 @@ namespace Migrator.Infrastructure.Extensions
 
         private static ApplicationSettings GetSettings(IConfiguration configuration)
         {
-            var applicationSettings = new ApplicationSettings();
-            
+            var applicationSettings = new ApplicationSettings();            
             var ravenConfig = configuration.GetSection("RavenDb");
-            applicationSettings.RavenDbSettings.Urls = ravenConfig.GetSection("Urls").Get<string[]>();
-            applicationSettings.RavenDbSettings.DatabaseName = ravenConfig.GetValue<string>("Database");
-            applicationSettings.RavenDbSettings.CertificatePath = ravenConfig.GetValue<string>("CertificatePath");
-            applicationSettings.RavenDbSettings.CertificateFileName = ravenConfig.GetValue<string>("CertificateFileName");
-
             var fileStorageConfig = configuration.GetSection("AzureFileStorage");
-            applicationSettings.AzureFileStorage.ShareName = fileStorageConfig.GetValue<string>("ShareName");
-            applicationSettings.AzureFileStorage.ConnectionString = fileStorageConfig.GetValue<string>("ConnectionString");
-            applicationSettings.AzureFileStorage.CertificateDirectoryName = fileStorageConfig.GetValue<string>("Directory");
-            applicationSettings.AzureFileStorage.Uri = fileStorageConfig.GetValue<string>("Uri");
+            applicationSettings.RavenDbSettings = ravenConfig.Get<RavenDbSettings>();
+            applicationSettings.AzureFileStorage = fileStorageConfig.Get<AzureFileStorageSettings>();
 
             return applicationSettings;
         }

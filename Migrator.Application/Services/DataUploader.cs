@@ -62,9 +62,17 @@ namespace Migrator.Application.Services
                     updatedList.Add(exportData.Value);
                 }
             }
+            var max = updatedList.Count / 25;
+            var batchSize = 0;
             foreach (var organisation in updatedList)
             {
                 await _session.StoreAsync(organisation);
+                batchSize++;
+                if (batchSize >= max)
+                {
+                    await _session.SaveChangesAsync();
+                    batchSize = 0;
+                }
             }
 
             await _session.SaveChangesAsync();

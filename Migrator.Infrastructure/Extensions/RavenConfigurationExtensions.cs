@@ -39,6 +39,9 @@ namespace Migrator.Infrastructure.Extensions
                 var metadata = eventArgs.DocumentMetadata;
                 metadata["Last-Updated-At"] = DateTime.UtcNow.ToString("o");
             };
+
+            new Organisation_ByName().Execute(store);
+
             services.AddSingleton<IDocumentStore>(store);
             services.AddScoped(provider =>
             {

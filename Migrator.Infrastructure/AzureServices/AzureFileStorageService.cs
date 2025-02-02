@@ -25,7 +25,7 @@ namespace Migrator.Infrastructure.AzureServices
             });
             try
             {
-                var token = credential.GetToken(new Azure.Core.TokenRequestContext(new[] { "https://storage.azure.com/.default" }));
+                var token = credential.GetToken(new Azure.Core.TokenRequestContext(new[] { "https://storage.azure.com//.default" }));
                 Console.WriteLine($"✅ Managed Identity Authentication Succeeded! Token Expires: {token.ExpiresOn}");
             }
             catch (Exception ex)
@@ -33,7 +33,7 @@ namespace Migrator.Infrastructure.AzureServices
                 Console.WriteLine($"❌ Managed Identity Authentication Failed: {ex.Message}");
             }
 
-            ShareClient share = new ShareClient(new Uri(_settings.Uri), credential);
+            ShareClient share = new ShareClient(new Uri($"{_settings.Uri}/{_settings.ShareName}"), credential);
             ShareDirectoryClient client = share.GetDirectoryClient(_settings.CertificateDirectoryName);
             var list = client.GetFilesAndDirectories().ToList();
             var fileItem = list.FirstOrDefault(file => !file.IsDirectory && file.Name == fileName);

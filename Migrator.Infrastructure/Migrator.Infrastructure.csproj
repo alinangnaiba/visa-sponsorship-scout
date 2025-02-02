@@ -15,4 +15,8 @@
     <PackageReference Include="RavenDB.Client" Version="6.2.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Migrator.Core\Migrator.Core.csproj" />
+  </ItemGroup>
+
 </Project>

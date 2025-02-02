@@ -38,8 +38,14 @@ namespace Migrator.API.Controllers
         }
 
         [HttpPost("upload")]
+        [Consumes("multipart/form-data")]
         public async Task<IActionResult> Post(IFormFile file)
         {
+            if (file == null || !Path.GetExtension(file.FileName).Equals(".csv", StringComparison.CurrentCultureIgnoreCase))
+            {
+                return BadRequest("Invalid file uploaded.");
+            }
+
             var totalChanges = await _dataUploader.SaveAsync(file);
             return Ok($"Total changes: {totalChanges}");
         }

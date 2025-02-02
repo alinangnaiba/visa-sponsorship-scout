@@ -21,24 +21,19 @@ namespace Migrator.Infrastructure.AzureServices
             {
                 var shareOptions = new ShareClientOptions
                 {
-                    // Specify the latest API version
                     ShareTokenIntent = ShareTokenIntent.Backup
                 };
-                var shareClient = new ShareClient(new Uri(_settings.Uri), new DefaultAzureCredential(), shareOptions);
+                var shareClient = new ShareClient(new Uri($"{_settings.Uri}/{_settings.ShareName}"), new DefaultAzureCredential(), shareOptions);
                 ShareDirectoryClient client = shareClient.GetDirectoryClient(_settings.CertificateDirectoryName);
-                Console.WriteLine($"✅ Share client created!");
                 ShareFileClient file = client.GetFileClient(fileName);
-                Console.WriteLine($"✅ File client created!");
-                Console.WriteLine($"✅ Downloading..........!");
                 ShareFileDownloadInfo download = file.DownloadAsync().GetAwaiter().GetResult();
-                Console.WriteLine($"✅ Downloading complete!");
-                using MemoryStream ms = new MemoryStream();
+                using MemoryStream ms = new();
                 download.Content.CopyTo(ms);
                 ms.Position = 0;
 
                 return ms.ToArray();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 throw;
             }            

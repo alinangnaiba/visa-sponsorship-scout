@@ -30,12 +30,12 @@ namespace Migrator.Application.Services
             using var stream = new StreamReader(file.OpenReadStream());
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
-                Delimiter = ",", // Specifies the delimiter
-                HasHeaderRecord = true, // Indicates that the CSV contains a header row
-                TrimOptions = TrimOptions.Trim, // Trims extra whitespace
-                BadDataFound = null, // Suppresses errors for malformed rows
-                HeaderValidated = null, // Ignores missing or unexpected headers
-                MissingFieldFound = null // Ignores missing fields in a row
+                Delimiter = ",",
+                HasHeaderRecord = true,
+                TrimOptions = TrimOptions.Trim,
+                BadDataFound = null,
+                HeaderValidated = null,
+                MissingFieldFound = null
             };
 
             using var csv = new CsvReader(stream, config);

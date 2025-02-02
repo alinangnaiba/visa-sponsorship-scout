@@ -18,7 +18,7 @@ namespace Migrator.Infrastructure.Extensions
             // Create and configure the DocumentStore
             var store = new DocumentStore
             {
-                Urls = applicationSettings.RavenDbSettings.Urls.ToArray(),
+                Urls = applicationSettings.RavenDbSettings.Urls,
                 Database = applicationSettings.RavenDbSettings.Database
             };
             if (TryGetCertificateFromStorage(applicationSettings.AzureFileStorage, applicationSettings.RavenDbSettings.CertificateFileName, out certificate))

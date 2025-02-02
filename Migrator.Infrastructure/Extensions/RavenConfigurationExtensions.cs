@@ -52,28 +52,18 @@ namespace Migrator.Infrastructure.Extensions
         private static ApplicationSettings GetSettings(IConfiguration configuration)
         {
             var applicationSettings = new ApplicationSettings();
-            if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("RAVENDB_URL")))
-            {
-                applicationSettings.RavenDbSettings.Urls = [Environment.GetEnvironmentVariable("RAVENDB_URL")];
-                applicationSettings.RavenDbSettings.DatabaseName = Environment.GetEnvironmentVariable("RAVENDB_NAME");
-                applicationSettings.RavenDbSettings.CertificateFileName = Environment.GetEnvironmentVariable("RAVENDB_CERTIFICATE_FILE_NAME");
-                applicationSettings.AzureFileStorage.ShareName = Environment.GetEnvironmentVariable("AZURE_FILE_STORAGE_SHARE_NAME");
-                applicationSettings.AzureFileStorage.CertificateDirectoryName = Environment.GetEnvironmentVariable("AZURE_FILE_STORAGE_CERTIFICATE_DIRECTORY_NAME");
-                applicationSettings.AzureFileStorage.Uri = Environment.GetEnvironmentVariable("AZURE_FILE_STORAGE_URI");
-            }
-            else
-            {
-                var ravenConfig = configuration.GetSection("RavenDb");
-                applicationSettings.RavenDbSettings.Urls = ravenConfig.GetSection("Urls").Get<string[]>();
-                applicationSettings.RavenDbSettings.DatabaseName = ravenConfig.GetValue<string>("Database");
-                applicationSettings.RavenDbSettings.CertificatePath = ravenConfig.GetValue<string>("CertificatePath");
-                applicationSettings.RavenDbSettings.CertificateFileName = ravenConfig.GetValue<string>("CertificateFileName");
+            
+            var ravenConfig = configuration.GetSection("RavenDb");
+            applicationSettings.RavenDbSettings.Urls = ravenConfig.GetSection("Urls").Get<string[]>();
+            applicationSettings.RavenDbSettings.DatabaseName = ravenConfig.GetValue<string>("Database");
+            applicationSettings.RavenDbSettings.CertificatePath = ravenConfig.GetValue<string>("CertificatePath");
+            applicationSettings.RavenDbSettings.CertificateFileName = ravenConfig.GetValue<string>("CertificateFileName");
 
-                var fileStorageConfig = configuration.GetSection("AzureFileStorage");
-                applicationSettings.AzureFileStorage.ShareName = fileStorageConfig.GetValue<string>("ShareName");
-                applicationSettings.AzureFileStorage.ConnectionString = fileStorageConfig.GetValue<string>("ConnectionString");
-                applicationSettings.AzureFileStorage.CertificateDirectoryName = fileStorageConfig.GetValue<string>("Directory");
-            }
+            var fileStorageConfig = configuration.GetSection("AzureFileStorage");
+            applicationSettings.AzureFileStorage.ShareName = fileStorageConfig.GetValue<string>("ShareName");
+            applicationSettings.AzureFileStorage.ConnectionString = fileStorageConfig.GetValue<string>("ConnectionString");
+            applicationSettings.AzureFileStorage.CertificateDirectoryName = fileStorageConfig.GetValue<string>("Directory");
+            applicationSettings.AzureFileStorage.Uri = fileStorageConfig.GetValue<string>("Uri");
 
             return applicationSettings;
         }

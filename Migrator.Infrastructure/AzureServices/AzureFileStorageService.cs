@@ -24,15 +24,15 @@ namespace Migrator.Infrastructure.AzureServices
             //    ExcludeSharedTokenCacheCredential = true
             //});
             var credential = new DefaultAzureCredential();
-            try
-            {
-                var token = credential.GetToken(new Azure.Core.TokenRequestContext(new[] { "https://storage.azure.com//.default" }));
-                Console.WriteLine($"✅ Managed Identity Authentication Succeeded! Token Expires: {token.ExpiresOn}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"❌ Managed Identity Authentication Failed: {ex.Message}");
-            }
+            //try
+            //{
+            //    var token = credential.GetToken(new Azure.Core.TokenRequestContext(new[] { "https://storage.azure.com//.default" }));
+            //    Console.WriteLine($"✅ Managed Identity Authentication Succeeded! Token Expires: {token.ExpiresOn}");
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine($"❌ Managed Identity Authentication Failed: {ex.Message}");
+            //}
 
             try
             {

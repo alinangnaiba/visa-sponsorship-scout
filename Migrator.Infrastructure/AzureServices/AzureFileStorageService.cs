@@ -2,7 +2,6 @@
 using Azure.Storage.Files.Shares;
 using Azure.Storage.Files.Shares.Models;
 using Migrator.Infrastructure.Configuration;
-using Newtonsoft.Json.Linq;
 
 namespace Migrator.Infrastructure.AzureServices
 {

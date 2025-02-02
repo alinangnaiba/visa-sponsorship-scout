@@ -80,8 +80,7 @@ namespace Migrator.Infrastructure.Extensions
 
         private static bool TryGetCertificate(AzureFileStorageSettings settings, string fileName, out X509Certificate2? certificate)
         {
-            if (string.IsNullOrWhiteSpace(settings.ConnectionString) || string.IsNullOrWhiteSpace(settings.CertificateDirectoryName) ||
-                string.IsNullOrWhiteSpace(settings.ShareName) || string.IsNullOrWhiteSpace(fileName)) 
+            if (string.IsNullOrWhiteSpace(settings.CertificateDirectoryName) || string.IsNullOrWhiteSpace(settings.ShareName) || string.IsNullOrWhiteSpace(fileName)) 
             {
                 certificate = null;
                 return false;

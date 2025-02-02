@@ -48,14 +48,14 @@ namespace Migrator.Infrastructure.AzureServices
                 ShareFileDownloadInfo txtdownload = txtFileClient.Download();
                 using MemoryStream txtms = new MemoryStream();
                 txtdownload.Content.CopyTo(txtms);
+                return txtms.ToArray();
+                //ShareFileClient file = client.GetFileClient(fileName);
+                //ShareFileDownloadInfo download = file.Download();
+                //using MemoryStream ms = new MemoryStream();
+                //download.Content.CopyTo(ms);
+                //ms.Position = 0;
 
-                ShareFileClient file = client.GetFileClient(fileName);
-                ShareFileDownloadInfo download = file.Download();
-                using MemoryStream ms = new MemoryStream();
-                download.Content.CopyTo(ms);
-                ms.Position = 0;
-
-                return ms.ToArray();
+                //return ms.ToArray();
             }
             catch (Exception ex)
             {

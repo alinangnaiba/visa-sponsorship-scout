@@ -1,5 +1,4 @@
-﻿using Azure.Identity;
-using Azure.Storage.Files.Shares;
+﻿using Azure.Storage.Files.Shares;
 using Azure.Storage.Files.Shares.Models;
 using Migrator.Infrastructure.Configuration;
 
@@ -18,12 +17,8 @@ namespace Migrator.Infrastructure.AzureServices
         {
             try
             {
-                var shareOptions = new ShareClientOptions
-                {
-                    ShareTokenIntent = ShareTokenIntent.Backup
-                };
                 //Not using Key Vault just coz I'm cheap
-                var shareClient = new ShareClient(new Uri($"{_settings.Uri}/{_settings.ShareName}"), new DefaultAzureCredential(), shareOptions);
+                var shareClient = ShareClientFactory.Create(_settings);
                 ShareDirectoryClient client = shareClient.GetDirectoryClient(_settings.CertificateDirectoryName);
                 ShareFileClient file = client.GetFileClient(fileName);
                 ShareFileDownloadInfo download = file.DownloadAsync().GetAwaiter().GetResult();

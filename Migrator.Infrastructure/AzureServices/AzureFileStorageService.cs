@@ -16,13 +16,13 @@ namespace Migrator.Infrastructure.AzureServices
 
         public byte[]? GetByte(string fileName)
         {
-            //var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
-            //{
-            //    ExcludeEnvironmentCredential = true,
-            //    ExcludeManagedIdentityCredential = false,
-            //    ExcludeVisualStudioCredential = true,
-            //    ExcludeSharedTokenCacheCredential = true
-            //});
+            var credential = new DefaultAzureCredential(new DefaultAzureCredentialOptions
+            {
+                ExcludeEnvironmentCredential = true,
+                ExcludeManagedIdentityCredential = false,
+                ExcludeVisualStudioCredential = true,
+                ExcludeSharedTokenCacheCredential = true
+            });
             //try
             //{
             //    var token = credential.GetToken(new Azure.Core.TokenRequestContext(new[] { "https://storage.azure.com//.default" }));
@@ -33,7 +33,7 @@ namespace Migrator.Infrastructure.AzureServices
             //    Console.WriteLine($"❌ Managed Identity Authentication Failed: {ex.Message}");
             //}
 
-            ShareClient share = new ShareClient(new Uri($"{_settings.Uri}/{_settings.ShareName}"), new DefaultAzureCredential());
+            ShareClient share = new ShareClient(new Uri($"{_settings.Uri}/{_settings.ShareName}"), credential);
             ShareDirectoryClient client = share.GetDirectoryClient(_settings.CertificateDirectoryName);
             var list = client.GetFilesAndDirectories().ToList();
             var fileItem = list.FirstOrDefault(file => !file.IsDirectory && file.Name == fileName);

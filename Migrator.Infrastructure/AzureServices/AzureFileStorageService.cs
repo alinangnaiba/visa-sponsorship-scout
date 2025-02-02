@@ -2,6 +2,7 @@
 using Azure.Storage.Files.Shares;
 using Azure.Storage.Files.Shares.Models;
 using Migrator.Infrastructure.Configuration;
+using Newtonsoft.Json.Linq;
 
 namespace Migrator.Infrastructure.AzureServices
 {
@@ -38,24 +39,17 @@ namespace Migrator.Infrastructure.AzureServices
             {
                 var shareClient = new ShareClient(new Uri(_settings.Uri), new DefaultAzureCredential());
                 ShareDirectoryClient client = shareClient.GetDirectoryClient(_settings.CertificateDirectoryName);
-                //var list = client.GetFilesAndDirectories().ToList();
-                //var fileItem = list.FirstOrDefault(file => !file.IsDirectory && file.Name == fileName);
-                //if (fileItem is null)
-                //{
-                //    return null;
-                //}
-                ShareFileClient txtFileClient = client.GetFileClient("test_text.txt");
-                ShareFileDownloadInfo txtdownload = txtFileClient.Download();
-                using MemoryStream txtms = new MemoryStream();
-                txtdownload.Content.CopyTo(txtms);
-                return txtms.ToArray();
-                //ShareFileClient file = client.GetFileClient(fileName);
-                //ShareFileDownloadInfo download = file.Download();
-                //using MemoryStream ms = new MemoryStream();
-                //download.Content.CopyTo(ms);
-                //ms.Position = 0;
+                Console.WriteLine($"✅ Share client created!");
+                ShareFileClient file = client.GetFileClient(fileName);
+                Console.WriteLine($"✅ File client created!");
+                Console.WriteLine($"✅ Downloading..........!");
+                ShareFileDownloadInfo download = file.Download();
+                Console.WriteLine($"✅ Downloading complete!");
+                using MemoryStream ms = new MemoryStream();
+                download.Content.CopyTo(ms);
+                ms.Position = 0;
 
-                //return ms.ToArray();
+                return ms.ToArray();
             }
             catch (Exception ex)
             {

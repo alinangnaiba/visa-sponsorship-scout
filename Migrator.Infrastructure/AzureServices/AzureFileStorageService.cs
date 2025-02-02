@@ -19,7 +19,12 @@ namespace Migrator.Infrastructure.AzureServices
         {
             try
             {
-                var shareClient = new ShareClient(new Uri(_settings.Uri), new DefaultAzureCredential());
+                var shareOptions = new ShareClientOptions
+                {
+                    // Specify the latest API version
+                    ShareTokenIntent = ShareTokenIntent.Backup
+                };
+                var shareClient = new ShareClient(new Uri(_settings.Uri), new DefaultAzureCredential(), shareOptions);
                 ShareDirectoryClient client = shareClient.GetDirectoryClient(_settings.CertificateDirectoryName);
                 Console.WriteLine($"✅ Share client created!");
                 ShareFileClient file = client.GetFileClient(fileName);

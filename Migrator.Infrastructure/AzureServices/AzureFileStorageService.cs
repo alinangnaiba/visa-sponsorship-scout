@@ -34,21 +34,41 @@ namespace Migrator.Infrastructure.AzureServices
                 Console.WriteLine($"❌ Managed Identity Authentication Failed: {ex.Message}");
             }
 
-            var shareClient = new ShareClient(new Uri(_settings.Uri), new DefaultAzureCredential());
-            ShareDirectoryClient client = shareClient.GetDirectoryClient(_settings.CertificateDirectoryName);
-            //var list = client.GetFilesAndDirectories().ToList();
-            //var fileItem = list.FirstOrDefault(file => !file.IsDirectory && file.Name == fileName);
-            //if (fileItem is null)
-            //{
-            //    return null;
-            //}
-            ShareFileClient file = client.GetFileClient(fileName);
-            ShareFileDownloadInfo download = file.Download();
-            using MemoryStream ms = new MemoryStream();
-            download.Content.CopyTo(ms);
-            ms.Position = 0;
+            try
+            {
+                var shareClient = new ShareClient(new Uri(_settings.Uri), new DefaultAzureCredential());
+                ShareDirectoryClient client = shareClient.GetDirectoryClient(_settings.CertificateDirectoryName);
+                //var list = client.GetFilesAndDirectories().ToList();
+                //var fileItem = list.FirstOrDefault(file => !file.IsDirectory && file.Name == fileName);
+                //if (fileItem is null)
+                //{
+                //    return null;
+                //}
+                ShareFileClient file = client.GetFileClient(fileName);
+                ShareFileDownloadInfo download = file.Download();
+                using MemoryStream ms = new MemoryStream();
+                download.Content.CopyTo(ms);
+                ms.Position = 0;
 
-            return ms.ToArray();
+                return ms.ToArray();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message );
+                Console.WriteLine(ex.StackTrace);
+                return null;
+            }
+            //var shareClient = new ShareClient(new Uri(_settings.Uri), new DefaultAzureCredential());
+            //ShareDirectoryClient client = shareClient.GetDirectoryClient(_settings.CertificateDirectoryName);
+            ////var list = client.GetFilesAndDirectories().ToList();
+            ////var fileItem = list.FirstOrDefault(file => !file.IsDirectory && file.Name == fileName);
+            ////if (fileItem is null)
+            ////{
+            ////    return null;
+            ////}
+            //ShareFileClient file = client.GetFileClient(fileName);
+            //ShareFileDownloadInfo download = file.Download();
+            
         }
     }
 }

@@ -3,7 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Migrator.Infrastructure.AzureServices;
 using Migrator.Infrastructure.Configuration;
 using Raven.Client.Documents;
+using System;
 using System.Security.Cryptography.X509Certificates;
+using System.Text.Json;
 
 namespace Migrator.Infrastructure.Extensions
 {
@@ -13,6 +15,13 @@ namespace Migrator.Infrastructure.Extensions
         {
             X509Certificate2? certificate;
             var applicationSettings = GetSettings(configuration);
+            var options = new JsonSerializerOptions
+            {
+                WriteIndented = true
+            };
+
+            string jsonString = JsonSerializer.Serialize(applicationSettings, options);
+            Console.WriteLine(jsonString);
             // Create and configure the DocumentStore
             var store = new DocumentStore
             {

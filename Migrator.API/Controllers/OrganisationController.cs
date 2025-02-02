@@ -20,6 +20,10 @@ namespace Migrator.API.Controllers
         public async Task<IActionResult> GetByCounty(string county)
         {
             var result = await _dataRetriever.GetOrganisationByCountyAsync(county);
+            if (result.Count == 0)
+            {
+                return NotFound();
+            }
             return Ok(new {Data = result, Total = result.Count, Successful = true });
         }
 
@@ -27,6 +31,10 @@ namespace Migrator.API.Controllers
         public async Task<IActionResult> GetByTownOrCity(string townOrCity)
         {
             var result = await _dataRetriever.GetOrganisationByTownCityAsync(townOrCity);
+            if (result.Count == 0)
+            {
+                return NotFound();
+            }
             return Ok(new { Data = result, Total = result.Count, Successful = true });
         }
 
@@ -34,6 +42,10 @@ namespace Migrator.API.Controllers
         public async Task<IActionResult> GetByName(string name)
         {
             var result = await _dataRetriever.GetOrganisationByNameAsync(name);
+            if (result.Count == 0)
+            {
+                return NotFound();
+            }
             return Ok(new { Data = result, Total = result.Count, Successful = true });
         }
 

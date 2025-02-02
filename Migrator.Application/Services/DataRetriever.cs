@@ -1,5 +1,7 @@
 ﻿using Migrator.Core.Entities;
+using Migrator.Core.Models;
 using Raven.Client.Documents;
+using Raven.Client.Documents.Linq;
 using Raven.Client.Documents.Session;
 using System.Linq.Expressions;
 
@@ -7,14 +9,15 @@ namespace Migrator.Application.Services
 {
     public interface IDataRetriever
     {
-        Task<List<Organisation>> GetOrganisationListAsync();
-        Task<List<Organisation>> GetOrganisationByCountyAsync(string county);
-        Task<List<Organisation>> GetOrganisationByTownCityAsync(string townOrCity);
-        Task<List<Organisation>> GetOrganisationByNameAsync(string townOrCity);
+        Task<PagedResult<Organisation>> GetOrganisationListAsync(int page);
+        Task<PagedResult<Organisation>> GetOrganisationByCountyAsync(string county, int page);
+        Task<PagedResult<Organisation>> GetOrganisationByTownCityAsync(string townOrCity, int page);
+        Task<PagedResult<Organisation>> GetOrganisationByNameAsync(string townOrCity, int page);
     }
 
     public class DataRetriever : IDataRetriever
     {
+        const int _pageSize = 25;
         private readonly IAsyncDocumentSession _session;
 
         public DataRetriever(IAsyncDocumentSession session)
@@ -22,33 +25,46 @@ namespace Migrator.Application.Services
             _session = session;
         }
 
-        public async Task<List<Organisation>> GetOrganisationByCountyAsync(string county)
+        public async Task<PagedResult<Organisation>> GetOrganisationByCountyAsync(string county, int page = 1)
         {
-            return await FindByAsync(org => org.County == county);
+            return await FindByPagedAsync(org => org.County == county, page);
         }
 
-        public async Task<List<Organisation>> GetOrganisationByNameAsync(string name)
+        public async Task<PagedResult<Organisation>> GetOrganisationByNameAsync(string name, int page = 1)
         {
-            return await _session.Query<Organisation>()
-                .Search(org => org.OrganisationName, name)
+            return await FindByPagedAsync(org => org.OrganisationName == name, page);
+        }
+
+        public async Task<PagedResult<Organisation>> GetOrganisationByTownCityAsync(string townOrCity, int page = 1)
+        {
+            return await FindByPagedAsync(org => org.TownCity == townOrCity, page);
+        }
+
+        public async Task<PagedResult<Organisation>> GetOrganisationListAsync(int page = 1)
+        {
+            return await FindByPagedAsync(null, page);
+        }
+
+        private async Task<PagedResult<Organisation>> FindByPagedAsync(Expression<Func<Organisation, bool>>? predicate, int page)
+        {
+            var result = new PagedResult<Organisation>();
+            var query = _session.Query<Organisation>();
+            if (predicate != null)
+            {
+                query = query.Where(predicate);
+            }
+            result.TotalResult = await query.CountAsync();
+            result.Data = await query
+                .Statistics(out var stats)
+                .Skip((page - 1) * _pageSize)
+                .Take(_pageSize)
                 .ToListAsync();
-        }
 
-        public async Task<List<Organisation>> GetOrganisationByTownCityAsync(string townOrCity)
-        {
-            return await FindByAsync(org => org.TownCity == townOrCity);
-        }
+            result.PageSize = _pageSize;
+            result.CurrentPage = page;
+            result.TotalPages = (int)Math.Ceiling((double)result.TotalResult / _pageSize);
 
-        public async Task<List<Organisation>> GetOrganisationListAsync()
-        {
-            return await _session.Query<Organisation>().ToListAsync();
-        }
-
-        private async Task<List<Organisation>> FindByAsync(Expression<Func<Organisation, bool>> predicate)
-        {
-            return await _session.Query<Organisation>()
-                .Where(predicate)
-                .ToListAsync();
+            return result;
         }
     }
 }

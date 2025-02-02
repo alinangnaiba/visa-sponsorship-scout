@@ -16,37 +16,48 @@ namespace Migrator.API.Controllers
             _dataUploader = dataUploader;
         }
 
-        [HttpGet("county/{county}")]
-        public async Task<IActionResult> GetByCounty(string county)
+        [HttpGet("{page}")]
+        public async Task<IActionResult> GetAll(int page)
         {
-            var result = await _dataRetriever.GetOrganisationByCountyAsync(county);
-            if (result.Count == 0)
+            var result = await _dataRetriever.GetOrganisationListAsync(page);
+            if (result.Data.Count == 0)
             {
-                return NotFound();
+                return NotFound(result);
             }
-            return Ok(new {Data = result, Total = result.Count, Successful = true });
+            return Ok(result);
         }
 
-        [HttpGet("town-or-city/{townOrCity}")]
-        public async Task<IActionResult> GetByTownOrCity(string townOrCity)
+        [HttpGet("county/{county}/{page}")]
+        public async Task<IActionResult> GetByCountyPaged(string county, int page)
         {
-            var result = await _dataRetriever.GetOrganisationByTownCityAsync(townOrCity);
-            if (result.Count == 0)
+            var result = await _dataRetriever.GetOrganisationByCountyAsync(county, page);
+            if (result.Data.Count == 0)
             {
-                return NotFound();
+                return NotFound(result);
             }
-            return Ok(new { Data = result, Total = result.Count, Successful = true });
+            return Ok(result);
         }
 
-        [HttpGet("name/{name}")]
-        public async Task<IActionResult> GetByName(string name)
+        [HttpGet("town-or-city/{townOrCity}/{page}")]
+        public async Task<IActionResult> GetByTownOrCityPaged(string townOrCity, int page)
         {
-            var result = await _dataRetriever.GetOrganisationByNameAsync(name);
-            if (result.Count == 0)
+            var result = await _dataRetriever.GetOrganisationByTownCityAsync(townOrCity, page);
+            if (result.Data.Count == 0)
             {
-                return NotFound();
+                return NotFound(result);
             }
-            return Ok(new { Data = result, Total = result.Count, Successful = true });
+            return Ok(result);
+        }
+
+        [HttpGet("name/{name}/{page}")]
+        public async Task<IActionResult> GetByNamePaged(string name, int page)
+        {
+            var result = await _dataRetriever.GetOrganisationByNameAsync(name, page);
+            if (result.Data.Count == 0)
+            {
+                return NotFound(result);
+            }
+            return Ok(result);
         }
 
         [HttpPost("upload")]

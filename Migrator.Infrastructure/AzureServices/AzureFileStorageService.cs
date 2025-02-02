@@ -8,12 +8,12 @@ namespace Migrator.Infrastructure.AzureServices
     {
         private readonly AzureFileStorageSettings _settings;
 
-        public AzureFileStorageService(AzureFileStorageSettings settings) 
+        internal AzureFileStorageService(AzureFileStorageSettings settings) 
         {
             _settings = settings;
         }
 
-        public byte[]? GetByte(string fileName)
+        internal byte[]? GetByte(string fileName)
         {
             try
             {

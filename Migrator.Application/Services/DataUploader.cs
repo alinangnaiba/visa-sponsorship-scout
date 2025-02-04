@@ -1,11 +1,13 @@
 ﻿using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Http;
+using Migrator.Application.Dto;
 using Migrator.Application.Mapping;
 using Migrator.Core.Entities;
 using Raven.Client.Documents;
-using Raven.Client.Documents.Session;
+using System.Collections.Concurrent;
 using System.Globalization;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Migrator.Application.Services
 {
@@ -16,18 +18,77 @@ namespace Migrator.Application.Services
 
     public class DataUploader : IDataUploader
     {
-        private readonly IAsyncDocumentSession _session;
+        const int _batchSize = 5000;
+        const int _maxParallel = 4;
+        private readonly IDocumentStore _documentStore;
 
-        public DataUploader(IAsyncDocumentSession session)
+        public DataUploader(IDocumentStore documentStore)
         {
-            _session = session;
+            _documentStore = documentStore;
         }
 
+        //will insert duplicates. 
+        //TODO: find a way to check the db and only insert if it's not a duplicate, otherwise just update
         public async Task<int> SaveAsync(IFormFile file)
         {
-            var csvData = new List<Organisation>();
+            var recordQueue = new ConcurrentQueue<OrganisationDto>();
+            var semaphore = new SemaphoreSlim(_maxParallel);
+            int total = 0;
 
-            using var stream = new StreamReader(file.OpenReadStream());
+            var readTask = Task.Run(() => ReadCsv(file, recordQueue));
+            var updateSession = _documentStore.OpenAsyncSession();
+            var currentData = await updateSession.Query<Organisation>().ToListAsync();
+            var currentDataDictionary = currentData.ToDictionary(data => $"{data.Name.Trim()}{data.Route.Trim()}", data => data);
+            var tasks = new List<Task>();
+            while (!readTask.IsCompleted || !recordQueue.IsEmpty)
+            {
+                if (recordQueue.Count >= _batchSize || (readTask.IsCompleted && !recordQueue.IsEmpty))
+                {
+                    await semaphore.WaitAsync();
+                    tasks.Add(ProcessBatchAsync(currentDataDictionary, recordQueue, semaphore, () => Interlocked.Increment(ref total)));
+                }
+            }
+
+            await Task.WhenAll(tasks);
+            return total;
+        }
+
+        private async Task ProcessBatchAsync(Dictionary<string, Organisation> currentDataDictionary, ConcurrentQueue<OrganisationDto> recordQueue, SemaphoreSlim semaphore, Func<int> increment)
+        {
+            try
+            {
+                var batch = new List<Organisation>();
+                while (batch.Count < _batchSize && recordQueue.TryDequeue(out var dto))
+                {
+                    var key = $"{dto.Name.Trim()}{dto.Route.Trim()}";
+                    if (currentDataDictionary.TryGetValue(key, out var existingData))
+                    {
+                        existingData.TownCity = dto.TownCity.Trim();
+                        existingData.County = dto.County.Trim();
+                        existingData.TypeAndRating = dto.TypeAndRating.Trim();
+                        existingData.Route = dto.Route.Trim();
+                    }
+                    else
+                    {
+                        batch.Add(CreateOrganisationEntity(dto));
+                    }
+                    increment();
+                }
+
+                using var bulkInsert = _documentStore.BulkInsert();
+                foreach (var organisation in batch)
+                {
+                    await bulkInsert.StoreAsync(organisation);
+                }
+            }
+            finally
+            {
+                semaphore.Release();
+            }
+        }
+
+        private static void ReadCsv(IFormFile file, ConcurrentQueue<OrganisationDto> recordQueue)
+        {
             var config = new CsvConfiguration(CultureInfo.InvariantCulture)
             {
                 Delimiter = ",",
@@ -37,46 +98,28 @@ namespace Migrator.Application.Services
                 HeaderValidated = null,
                 MissingFieldFound = null
             };
-
-            using var csv = new CsvReader(stream, config);
+            using var reader = new StreamReader(file.OpenReadStream());
+            using var csv = new CsvReader(reader, config);
             csv.Context.RegisterClassMap<OrganisationMap>();
-            csvData = csv.GetRecords<Organisation>().ToList();
 
-            var csvDataDictionary = csvData.ToDictionaryIgnoringDuplicates(data => $"{data.OrganisationName.Trim()}{data.Route.Trim()}", data => data);
-
-            var currentData = await _session.Query<Organisation>().ToListAsync();
-            var currentDataDictionary = currentData.ToDictionary(data => $"{data.OrganisationName.Trim()}{data.Route.Trim()}", data => data);
-            var updatedList = new List<Organisation>();
-            foreach (var exportData in csvDataDictionary)
+            while (csv.Read())
             {
-                if (currentDataDictionary.TryGetValue(exportData.Key, out var existingData))
-                {
-                    existingData.TownCity = exportData.Value.TownCity.Trim();
-                    existingData.County = exportData.Value.County.Trim();
-                    existingData.TypeAndRating = exportData.Value.TypeAndRating.Trim();
-                    existingData.Route = exportData.Value.Route.Trim();
-                }
-                else
-                {
-                    exportData.Value.Id = Guid.NewGuid().ToString();
-                    updatedList.Add(exportData.Value);
-                }
+                var organisation = csv.GetRecord<OrganisationDto>();
+                recordQueue.Enqueue(organisation);
             }
-            var max = updatedList.Count / 25;
-            var batchSize = 0;
-            foreach (var organisation in updatedList)
-            {
-                await _session.StoreAsync(organisation);
-                batchSize++;
-                if (batchSize >= max)
-                {
-                    await _session.SaveChangesAsync();
-                    batchSize = 0;
-                }
-            }
+        }
 
-            await _session.SaveChangesAsync();
-            return updatedList.Count;
+        private Organisation CreateOrganisationEntity(OrganisationDto data)
+        {
+            return new Organisation
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = data.Name,
+                County = data.County,
+                Route = data.Route,
+                TownCity = data.TownCity,
+                TypeAndRating = data.TypeAndRating,
+            };
         }
     }
 }

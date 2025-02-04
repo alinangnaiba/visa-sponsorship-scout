@@ -1,13 +1,13 @@
 ﻿using CsvHelper.Configuration;
-using Migrator.Core.Entities;
+using Migrator.Application.Dto;
 
 namespace Migrator.Application.Mapping
 {
-    internal class OrganisationMap : ClassMap<Organisation>
+    internal class OrganisationMap : ClassMap<OrganisationDto>
     {
         internal OrganisationMap()
         {
-            Map(o => o.OrganisationName).Name("Organisation Name");
+            Map(o => o.Name).Name("Organisation Name");
             Map(o => o.TownCity).Name("Town/City");
             Map(o => o.County).Name("County");
             Map(o => o.TypeAndRating).Name("Type & Rating");

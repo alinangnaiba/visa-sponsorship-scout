@@ -1,8 +1,7 @@
-﻿namespace Migrator.Core.Entities
+﻿namespace Migrator.Application.Dto
 {
-    public class Organisation
+    internal class OrganisationDto
     {
-        public string Id { get; set; } // RavenDB uses a string ID
         public string Name { get; set; }
         public string TownCity { get; set; }
         public string County { get; set; }

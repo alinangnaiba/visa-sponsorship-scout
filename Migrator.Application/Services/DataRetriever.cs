@@ -71,7 +71,7 @@ namespace Migrator.Application.Services
         {
             var result = new PagedResult<Organisation>();
             var query = _session.Query<Organisation>();
-            query = query.Search(org => org.OrganisationName, keyword);
+            query = query.Search(org => org.Name, keyword);
             result.TotalResult = await query.CountAsync();
             result.Data = await query
                 .Statistics(out var stats)

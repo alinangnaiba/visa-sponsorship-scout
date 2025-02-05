@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Migrator.API.Extensions;
 using Migrator.Application.Services;
 
 namespace Migrator.API.Controllers
@@ -22,9 +23,9 @@ namespace Migrator.API.Controllers
             var result = await _dataRetriever.GetOrganisationListAsync(page);
             if (result.Data.Count == 0)
             {
-                return NotFound(result);
+                return NotFound(result.ToModel());
             }
-            return Ok(result);
+            return Ok(result.ToModel());
         }
 
         [HttpGet("county/{county}/{page}")]
@@ -33,9 +34,9 @@ namespace Migrator.API.Controllers
             var result = await _dataRetriever.GetOrganisationByCountyAsync(county, page);
             if (result.Data.Count == 0)
             {
-                return NotFound(result);
+                return NotFound(result.ToModel());
             }
-            return Ok(result);
+            return Ok(result.ToModel());
         }
 
         [HttpGet("town-or-city/{townOrCity}/{page}")]
@@ -44,9 +45,10 @@ namespace Migrator.API.Controllers
             var result = await _dataRetriever.GetOrganisationByTownCityAsync(townOrCity, page);
             if (result.Data.Count == 0)
             {
-                return NotFound(result);
+                return NotFound(result.ToModel());
             }
-            return Ok(result);
+            var resultModel = result.ToModel();
+            return Ok(resultModel);
         }
 
         [HttpGet("name/{name}/{page}")]
@@ -55,7 +57,7 @@ namespace Migrator.API.Controllers
             var result = await _dataRetriever.GetOrganisationByNameAsync(name, page);
             if (result.Data.Count == 0)
             {
-                return NotFound(result);
+                return NotFound(result.ToModel());
             }
             return Ok(result);
         }

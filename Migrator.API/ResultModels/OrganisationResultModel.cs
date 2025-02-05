@@ -1,8 +1,7 @@
-﻿namespace Migrator.Core.Entities
+﻿namespace Migrator.API.ResultModels
 {
-    public class Organisation
+    public class OrganisationResultModel
     {
-        public string Id { get; set; } // RavenDB uses a string ID
         public string Name { get; set; }
         public List<string> TownCities { get; set; }
         public string County { get; set; }

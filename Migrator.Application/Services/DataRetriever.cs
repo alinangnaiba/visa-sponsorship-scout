@@ -37,7 +37,7 @@ namespace Migrator.Application.Services
 
         public async Task<PagedResult<Organisation>> GetOrganisationByTownCityAsync(string townOrCity, int page = 1)
         {
-            return await FindByPagedAsync(org => org.TownCity == townOrCity, page);
+            return await FindByPagedAsync(org => org.TownCities.Contains(townOrCity), page);
         }
 
         public async Task<PagedResult<Organisation>> GetOrganisationListAsync(int page = 1)
@@ -71,7 +71,7 @@ namespace Migrator.Application.Services
         {
             var result = new PagedResult<Organisation>();
             var query = _session.Query<Organisation>();
-            query = query.Search(org => org.OrganisationName, keyword);
+            query = query.Search(org => org.Name, keyword);
             result.TotalResult = await query.CountAsync();
             result.Data = await query
                 .Statistics(out var stats)

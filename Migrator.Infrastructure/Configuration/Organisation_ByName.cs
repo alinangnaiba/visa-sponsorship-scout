@@ -10,10 +10,10 @@ namespace Migrator.Infrastructure.Configuration
             Map = organisations => from org in organisations
                                    select new
                                    {
-                                       OrganisationName = org.OrganisationName,
+                                       org.Name,
                                    };
 
-            Indexes.Add(x => x.OrganisationName, FieldIndexing.Search);
+            Indexes.Add(x => x.Name, FieldIndexing.Search);
         }
     }
 }

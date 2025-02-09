@@ -25,11 +25,6 @@ namespace Migrator.Infrastructure.Extensions
             {
                 store.Certificate = certificate;
             }
-            else
-            {
-                certificate = new X509Certificate2(applicationSettings.RavenDbSettings.CertificatePath);
-                store.Certificate = certificate;
-            }
 
             store.Initialize();  // Initialize the RavenDB connection
 
@@ -65,7 +60,7 @@ namespace Migrator.Infrastructure.Extensions
 
         private static bool TryGetCertificateFromStorage(AzureFileStorageSettings settings, string fileName, out X509Certificate2? certificate)
         {
-            if (string.IsNullOrWhiteSpace(settings.CertificateDirectoryName) || string.IsNullOrWhiteSpace(settings.ShareName) || string.IsNullOrWhiteSpace(fileName)) 
+            if (settings is null || string.IsNullOrWhiteSpace(settings.CertificateDirectoryName) || string.IsNullOrWhiteSpace(settings.ShareName) || string.IsNullOrWhiteSpace(fileName)) 
             {
                 certificate = null;
                 return false;

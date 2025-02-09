@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Migrator.API.Extensions;
+using Migrator.Application.Adapters;
 using Migrator.Application.Services;
+using Migrator.Core.Enums;
 
 namespace Migrator.API.Controllers
 {
@@ -60,6 +62,23 @@ namespace Migrator.API.Controllers
                 return NotFound(result.ToModel());
             }
             return Ok(result);
+        }
+
+        [HttpGet("routes")]
+        public IActionResult GetRoutes()
+        {
+            return Ok(WorkerRoutes.GetRoutes());
+        }
+
+        [HttpGet("routes/{id}")]
+        public IActionResult GetRouteById(int id)
+        {
+            if (!WorkerRoutes.TryGetValue((RouteEnum)id, out string value))
+            {
+                return BadRequest("Invalid worker route.");
+            }
+
+            return Ok(new { data = value });
         }
 
         [HttpPost("upload")]

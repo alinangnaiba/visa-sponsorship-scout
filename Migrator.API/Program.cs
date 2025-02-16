@@ -1,5 +1,6 @@
 using Migrator.Application.Services;
 using Migrator.Infrastructure.Extensions;
+using static Raven.Client.Constants;
 
 namespace Migrator
 {
@@ -19,8 +20,16 @@ namespace Migrator
                     {
                         policy
                         .AllowAnyHeader()
-                        .AllowAnyMethod()
-                        .WithOrigins([]);
+                        .AllowAnyMethod();
+                        if (bool.TryParse(builder.Configuration.GetSection("Cors:Enabled").Value, out bool isEnabled) && isEnabled)
+                        {
+                            IEnumerable<string> allowedCorsOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").GetChildren().Select(x => x.Value);
+                            policy.WithOrigins(allowedCorsOrigins.ToArray());
+                        }
+                        else
+                        {
+                            policy.SetIsOriginAllowed(_ => true);
+                        }
                     });
             });
 

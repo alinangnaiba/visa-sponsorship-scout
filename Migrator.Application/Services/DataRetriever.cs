@@ -1,4 +1,5 @@
-﻿using Migrator.Core.Entities;
+﻿using Migrator.Application.Dto;
+using Migrator.Core.Entities;
 using Migrator.Core.Models;
 using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
@@ -9,6 +10,7 @@ namespace Migrator.Application.Services
 {
     public interface IDataRetriever
     {
+        Task<PagedResult<DuplicteResponse>> GetDuplicates();
         Task<PagedResult<Organisation>> GetOrganisationListAsync(int page);
         Task<PagedResult<Organisation>> GetOrganisationByCountyAsync(string county, int page);
         Task<PagedResult<Organisation>> GetOrganisationByTownCityAsync(string townOrCity, int page);
@@ -23,6 +25,28 @@ namespace Migrator.Application.Services
         public DataRetriever(IAsyncDocumentSession session)
         {
             _session = session;
+        }
+
+        public async Task<PagedResult<DuplicteResponse>> GetDuplicates()
+        {
+            var result = new PagedResult<DuplicteResponse>();
+            var query = _session.Query<Organisation>();
+            var nameGroups = await _session.Query<Organisation>()
+            .GroupBy(x => x.Name)
+            .Select(g => new DuplicteResponse
+            {
+                Name = g.Key,
+                Count = g.Count()
+            }).ToListAsync();
+            var data = nameGroups
+            .Where(x => x.Count > 1)
+            .ToList();
+            result.Data = data;
+            result.TotalResult = result.Data.Count;
+            result.PageSize = _pageSize;
+            result.CurrentPage = 1;
+            result.TotalPages = (int)Math.Ceiling((double)result.TotalResult / _pageSize);
+            return result;
         }
 
         public async Task<PagedResult<Organisation>> GetOrganisationByCountyAsync(string county, int page = 1)

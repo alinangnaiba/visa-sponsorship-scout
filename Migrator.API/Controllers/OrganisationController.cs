@@ -19,6 +19,13 @@ namespace Migrator.API.Controllers
             _dataUploader = dataUploader;
         }
 
+        [HttpGet("duplicates")]
+        public async Task<IActionResult> GetDuplicates()
+        {
+            var result = await _dataRetriever.GetDuplicates();
+            return Ok(result);
+        }
+
         [HttpGet("{page}")]
         public async Task<IActionResult> GetAll(int page)
         {

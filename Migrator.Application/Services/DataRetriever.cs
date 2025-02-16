@@ -19,7 +19,7 @@ namespace Migrator.Application.Services
 
     public class DataRetriever : IDataRetriever
     {
-        const int _pageSize = 25;
+        const int _pageSize = 10;
         private readonly IAsyncDocumentSession _session;
 
         public DataRetriever(IAsyncDocumentSession session)

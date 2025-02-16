@@ -20,6 +20,17 @@ namespace Migrator
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAllOrigin",
+                    builder =>
+                    {
+                        builder
+                        .AllowAnyOrigin()
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                    });
+            });
 
             var app = builder.Build();
 
@@ -31,7 +42,7 @@ namespace Migrator
             }
 
             app.UseHttpsRedirection();
-
+            app.UseCors("AllowAllOrigin");
             app.UseAuthorization();
 
 

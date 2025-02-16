@@ -82,6 +82,7 @@ namespace Migrator.Application.Services
                 .Statistics(out var stats)
                 .Skip((page - 1) * _pageSize)
                 .Take(_pageSize)
+                .OrderBy(org => org.Name)
                 .ToListAsync();
 
             result.PageSize = _pageSize;
@@ -101,6 +102,7 @@ namespace Migrator.Application.Services
                 .Statistics(out var stats)
                 .Skip((page - 1) * _pageSize)
                 .Take(_pageSize)
+                .OrderBy(org => org.Name)
                 .ToListAsync();
 
             result.PageSize = _pageSize;

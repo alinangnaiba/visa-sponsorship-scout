@@ -3,9 +3,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Migrator.Infrastructure.AzureServices;
 using Migrator.Infrastructure.Configuration;
 using Raven.Client.Documents;
-using System;
+using Raven.Client.ServerWide;
+using Raven.Client.ServerWide.Operations;
 using System.Security.Cryptography.X509Certificates;
-using System.Text.Json;
 
 namespace Migrator.Infrastructure.Extensions
 {
@@ -13,20 +13,9 @@ namespace Migrator.Infrastructure.Extensions
     {
         public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
         {
-            X509Certificate2? certificate;
             var applicationSettings = GetSettings(configuration);
-            // Create and configure the DocumentStore
-            var store = new DocumentStore
-            {
-                Urls = applicationSettings.RavenDbSettings.Urls,
-                Database = applicationSettings.RavenDbSettings.Database
-            };
-            if (TryGetCertificateFromStorage(applicationSettings.AzureFileStorage, applicationSettings.RavenDbSettings.CertificateFileName, out certificate))
-            {
-                store.Certificate = certificate;
-            }
 
-            store.Initialize();  // Initialize the RavenDB connection
+            var store = CreateDocumentStore(applicationSettings);
 
             // Add last updated at in metadata
             store.OnBeforeStore += (sender, eventArgs) =>
@@ -41,7 +30,7 @@ namespace Migrator.Infrastructure.Extensions
             services.AddScoped(provider =>
             {
                 var store = provider.GetRequiredService<IDocumentStore>();
-                return store.OpenAsyncSession(); // Scoped session for each request
+                return store.OpenAsyncSession();
             });
 
             return services;
@@ -76,6 +65,41 @@ namespace Migrator.Infrastructure.Extensions
             {
                 certificate = null;
                 return false;
+            }
+        }
+
+        private static DocumentStore CreateDocumentStore(ApplicationSettings applicationSettings)
+        {
+            X509Certificate2? certificate;
+            var store = new DocumentStore
+            {
+                Urls = applicationSettings.RavenDbSettings.Urls,
+                Database = applicationSettings.RavenDbSettings.Database
+            };
+            if (TryGetCertificateFromStorage(applicationSettings.AzureFileStorage, applicationSettings.RavenDbSettings.CertificateFileName, out certificate))
+            {
+                store.Certificate = certificate;
+            }
+            store.Initialize();
+            EnsureDatabaseExists(store, applicationSettings.RavenDbSettings.Database);
+
+            return store;
+        }
+
+        private static void EnsureDatabaseExists(DocumentStore store, string dbName)
+        {
+            try
+            {
+                var db = store.Maintenance.Server.Send(new GetDatabaseRecordOperation(dbName));
+                if (db is null)
+                {
+                    var createDbOperation = new CreateDatabaseOperation(new DatabaseRecord(dbName));
+                    store.Maintenance.Server.Send(createDbOperation);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Failed to create/verify database: {dbName}", ex);
             }
         }
     }

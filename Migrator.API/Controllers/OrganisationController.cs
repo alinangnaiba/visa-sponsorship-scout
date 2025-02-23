@@ -19,13 +19,6 @@ namespace Migrator.API.Controllers
             _dataUploader = dataUploader;
         }
 
-        [HttpGet("duplicates")]
-        public async Task<IActionResult> GetDuplicates()
-        {
-            var result = await _dataRetriever.GetDuplicates();
-            return Ok(result);
-        }
-
         [HttpGet("{page}")]
         public async Task<IActionResult> GetAll(int page)
         {
@@ -68,7 +61,7 @@ namespace Migrator.API.Controllers
             {
                 return NotFound(result.ToModel());
             }
-            return Ok(result);
+            return Ok(result.ToModel());
         }
 
         [HttpGet("routes")]
@@ -85,7 +78,7 @@ namespace Migrator.API.Controllers
                 return BadRequest("Invalid worker route.");
             }
 
-            return Ok(new { data = value });
+            return Ok(new { Data = value, Success = true });
         }
 
         [HttpPost("upload")]

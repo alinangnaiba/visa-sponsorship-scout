@@ -68,7 +68,7 @@ namespace Migrator.Infrastructure.Extensions
             }
         }
 
-        private static IDocumentStore CreateDocumentStore(ApplicationSettings applicationSettings)
+        private static DocumentStore CreateDocumentStore(ApplicationSettings applicationSettings)
         {
             X509Certificate2? certificate;
             var store = new DocumentStore
@@ -86,7 +86,7 @@ namespace Migrator.Infrastructure.Extensions
             return store;
         }
 
-        private static void EnsureDatabaseExists(IDocumentStore store, string dbName)
+        private static void EnsureDatabaseExists(DocumentStore store, string dbName)
         {
             try
             {

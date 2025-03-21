@@ -7,7 +7,7 @@ namespace VisaSponsorshipScout.Infrastructure.AzureServices
 {
     internal sealed class ShareClientFactory
     {
-        internal static ShareClient Create(AzureFileStorageSettings settings)
+        internal static ShareClient Create(FileStorageSettings settings)
         {
             var shareOptions = new ShareClientOptions
             {

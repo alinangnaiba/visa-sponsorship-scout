@@ -1,11 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using VisaSponsorshipScout.Infrastructure.AzureServices;
 using VisaSponsorshipScout.Infrastructure.Configuration;
 using Raven.Client.Documents;
 using Raven.Client.ServerWide;
 using Raven.Client.ServerWide.Operations;
 using System.Security.Cryptography.X509Certificates;
+using VisaSponsorshipScout.Infrastructure.CloudServices;
+using System.IO;
 
 namespace VisaSponsorshipScout.Infrastructure.Extensions
 {
@@ -39,26 +40,26 @@ namespace VisaSponsorshipScout.Infrastructure.Extensions
         private static ApplicationSettings GetSettings(IConfiguration configuration)
         {
             var applicationSettings = new ApplicationSettings();            
-            var ravenConfig = configuration.GetSection("RavenDb");
-            var fileStorageConfig = configuration.GetSection("AzureFileStorage");
-            applicationSettings.RavenDbSettings = ravenConfig.Get<RavenDbSettings>();
-            applicationSettings.AzureFileStorage = fileStorageConfig.Get<AzureFileStorageSettings>();
+            var databaseConfig = configuration.GetSection(nameof(DatabaseSettings));
+            var fileStorageConfig = configuration.GetSection(nameof(FileStorageSettings));
+            applicationSettings.DatabaseSettings = databaseConfig.Get<DatabaseSettings>();
+            applicationSettings.FileStorage = fileStorageConfig.Get<FileStorageSettings>();
 
             return applicationSettings;
         }
 
-        private static bool TryGetCertificateFromStorage(AzureFileStorageSettings settings, string fileName, out X509Certificate2? certificate)
+        private static bool TryGetCertificateFromStorage(FileStorageSettings settings, string fileName, out X509Certificate2? certificate)
         {
-            if (settings is null || string.IsNullOrWhiteSpace(settings.CertificateDirectoryName) || string.IsNullOrWhiteSpace(settings.ShareName) || string.IsNullOrWhiteSpace(fileName)) 
+            if (!IsValidSettings(settings)) 
             {
                 certificate = null;
                 return false;
             }
-            var fileStorageService = new AzureFileStorageService(settings);
-            var bytes = fileStorageService.GetByte(fileName);
+            ICloudStorageService fileStorageService = StorageServiceFactory.Create(settings);
+            byte[]? bytes = fileStorageService.DownloadToMemory(fileName);
             if (bytes is not null)
             {
-                certificate = new X509Certificate2(bytes);
+                certificate = X509CertificateLoader.LoadPkcs12(bytes.ToArray(), null);
                 return true;
             }
             else
@@ -68,20 +69,34 @@ namespace VisaSponsorshipScout.Infrastructure.Extensions
             }
         }
 
+        private static bool IsValidSettings(FileStorageSettings settings)
+        {
+            if (settings is null)
+            {
+                return false;
+            }
+            if (settings.CloudService is "Azure")
+            {
+                return !string.IsNullOrWhiteSpace(settings.CertificateDirectoryName) && !string.IsNullOrWhiteSpace(settings.ShareName) && !string.IsNullOrWhiteSpace(settings.FileName); ;
+            }
+            
+            return !string.IsNullOrWhiteSpace(settings.BucketName) && !string.IsNullOrWhiteSpace(settings.FileName) && !string.IsNullOrWhiteSpace(settings.FileName);
+        }
+
         private static DocumentStore CreateDocumentStore(ApplicationSettings applicationSettings)
         {
             X509Certificate2? certificate;
             var store = new DocumentStore
             {
-                Urls = applicationSettings.RavenDbSettings.Urls,
-                Database = applicationSettings.RavenDbSettings.Database
+                Urls = applicationSettings.DatabaseSettings.Urls,
+                Database = applicationSettings.DatabaseSettings.Database
             };
-            if (TryGetCertificateFromStorage(applicationSettings.AzureFileStorage, applicationSettings.RavenDbSettings.CertificateFileName, out certificate))
+            if (TryGetCertificateFromStorage(applicationSettings.FileStorage, applicationSettings.FileStorage.FileName, out certificate))
             {
                 store.Certificate = certificate;
             }
             store.Initialize();
-            EnsureDatabaseExists(store, applicationSettings.RavenDbSettings.Database);
+            EnsureDatabaseExists(store, applicationSettings.DatabaseSettings.Database);
 
             return store;
         }

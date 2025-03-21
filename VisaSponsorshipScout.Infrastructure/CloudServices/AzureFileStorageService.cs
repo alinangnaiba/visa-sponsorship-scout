@@ -1,23 +1,23 @@
 ﻿using Azure.Storage.Files.Shares;
 using Azure.Storage.Files.Shares.Models;
+using VisaSponsorshipScout.Infrastructure.AzureServices;
 using VisaSponsorshipScout.Infrastructure.Configuration;
 
-namespace VisaSponsorshipScout.Infrastructure.AzureServices
+namespace VisaSponsorshipScout.Infrastructure.CloudServices
 {
-    internal class AzureFileStorageService
+    internal class AzureFileStorageService : ICloudStorageService
     {
-        private readonly AzureFileStorageSettings _settings;
+        private readonly FileStorageSettings _settings;
 
-        internal AzureFileStorageService(AzureFileStorageSettings settings) 
+        internal AzureFileStorageService(FileStorageSettings settings) 
         {
             _settings = settings;
         }
 
-        internal byte[]? GetByte(string fileName)
+        public byte[]? DownloadToMemory(string fileName)
         {
             try
             {
-                //Not using Key Vault just coz I'm cheap
                 var shareClient = ShareClientFactory.Create(_settings);
                 ShareDirectoryClient client = shareClient.GetDirectoryClient(_settings.CertificateDirectoryName);
                 ShareFileClient file = client.GetFileClient(fileName);

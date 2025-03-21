@@ -2,22 +2,23 @@
 {
     internal class ApplicationSettings
     {
-        public AzureFileStorageSettings AzureFileStorage { get; set; } = new AzureFileStorageSettings();
-        public RavenDbSettings RavenDbSettings { get; set; } = new RavenDbSettings();
+        public FileStorageSettings FileStorage { get; set; } = new FileStorageSettings();
+        public DatabaseSettings DatabaseSettings { get; set; } = new DatabaseSettings();
     }
 
-    internal class AzureFileStorageSettings
+    internal class FileStorageSettings
     {
+        public string BucketName { get; set; }
         public string CertificateDirectoryName { get; set; }
+        public string CloudService { get; set; }
         public string ConnectionString { get; set; }
+        public string FileName { get; set; }
         public string ShareName { get; set; }
         public string Uri { get; set; }
     }
 
-    internal class RavenDbSettings
+    internal class DatabaseSettings
     {
-        public string CertificateFileName { get; set; }
-        public string CertificatePath { get; set; }
         public string Database { get; set; }
         public string[] Urls { get; set; }
     }

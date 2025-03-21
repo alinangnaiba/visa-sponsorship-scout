@@ -1,7 +1,7 @@
 using VisaSponsorshipScout.Application.Services;
 using VisaSponsorshipScout.Infrastructure.Extensions;
 
-namespace Migrator
+namespace VisaSponsorshipScout.API
 {
     public class Program
     {

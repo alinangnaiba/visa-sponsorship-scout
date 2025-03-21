@@ -82,6 +82,7 @@ namespace VisaSponsorshipScout.API.Controllers
             return Ok(new { Data = value, Success = true });
         }
 
+        //TODO: deprecate
         [HttpPost("upload")]
         [Consumes("multipart/form-data")]
         public async Task<IActionResult> Post(IFormFile file)

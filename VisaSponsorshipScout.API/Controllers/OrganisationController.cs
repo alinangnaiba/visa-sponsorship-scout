@@ -31,7 +31,7 @@ namespace VisaSponsorshipScout.API.Controllers
             return Ok(result.ToModel());
         }
 
-        [HttpGet("county/{county}/{page}")]
+        [HttpGet("county/{county}/page/{page}")]
         public async Task<IActionResult> GetByCountyPaged(string county, int page)
         {
             var result = await _dataRetriever.GetOrganisationByCountyAsync(county, page);
@@ -42,7 +42,7 @@ namespace VisaSponsorshipScout.API.Controllers
             return Ok(result.ToModel());
         }
 
-        [HttpGet("town-or-city/{townOrCity}/{page}")]
+        [HttpGet("town-or-city/{townOrCity}/page/{page}")]
         public async Task<IActionResult> GetByTownOrCityPaged(string townOrCity, int page)
         {
             var result = await _dataRetriever.GetOrganisationByTownCityAsync(townOrCity, page);
@@ -54,7 +54,7 @@ namespace VisaSponsorshipScout.API.Controllers
             return Ok(resultModel);
         }
 
-        [HttpGet("name/{name}/{page}")]
+        [HttpGet("name/{name}/page/{page}")]
         public async Task<IActionResult> GetByNamePaged(string name, int page)
         {
             var result = await _dataRetriever.GetOrganisationByNameAsync(name, page);

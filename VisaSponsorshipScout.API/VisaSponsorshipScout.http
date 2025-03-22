@@ -1,6 +1,6 @@
-@Migrator_HostAddress = http://localhost:5269
+###@Migrator_HostAddress = http://localhost:8530
 
-GET {{Migrator_HostAddress}}/weatherforecast/
+##GET {{Migrator_HostAddress}}/weatherforecast/
 Accept: application/json
-
+##
 ###

@@ -1,3 +1,6 @@
+ENV ASPNETCORE_URLS=http://+:8530
+ENV PORT 8530
+
 # Stage 1: Build Stage
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-env
 WORKDIR /app

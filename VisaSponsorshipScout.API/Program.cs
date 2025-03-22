@@ -56,15 +56,17 @@ namespace VisaSponsorshipScout.API
             
             app.MapControllers();
             
-            if (app.Environment.IsProduction())
-            {
-                string url = $"http://0.0.0.0:8530";
-                app.Run(url);
-            }
-            else
-            {
-                app.Run();
-            }
+            //if (app.Environment.IsProduction())
+            //{
+            //    string url = $"http://0.0.0.0:8080";
+            //    app.Run(url);
+            //}
+            //else
+            //{
+            //    app.Run();
+            //}
+            string url = $"http://0.0.0.0:8080";
+            app.Run(url);
         }
     }
 }

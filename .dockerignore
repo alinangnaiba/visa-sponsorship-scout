@@ -2,9 +2,6 @@
 bin/
 obj/
 
-# Ignore solution files
-*.sln
-
 # Ignore NuGet packages
 packages/
 

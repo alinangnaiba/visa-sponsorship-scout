@@ -1,6 +1,3 @@
-ENV ASPNETCORE_URLS=http://+:8080
-ENV PORT 8080
-
 # Stage 1: Build Stage
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-env
 WORKDIR /app
@@ -30,6 +27,8 @@ WORKDIR /app
 COPY --from=build-env /app/out .
 
 # Use port
+ENV ASPNETCORE_URLS=http://+:8080
+ENV PORT=8080
 EXPOSE 8080
 
 # Entry point

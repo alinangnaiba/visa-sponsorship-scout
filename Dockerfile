@@ -1,5 +1,5 @@
-ENV ASPNETCORE_URLS=http://+:8100
-ENV PORT 8100
+ENV ASPNETCORE_URLS=http://+:8080
+ENV PORT 8080
 
 # Stage 1: Build Stage
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build-env
@@ -30,7 +30,7 @@ WORKDIR /app
 COPY --from=build-env /app/out .
 
 # Use port
-EXPOSE 8100
+EXPOSE 8080
 
 # Entry point
 ENTRYPOINT ["dotnet", "VisaSponsorshipScout.API.dll"]

@@ -58,7 +58,7 @@ namespace VisaSponsorshipScout.API
 
             if (app.Environment.IsProduction())
             {
-                string port = Environment.GetEnvironmentVariable("PORT") ?? "8100";
+                string port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
                 string url = $"http://0.0.0.0:{port}";
                 app.Run(url);
             }
@@ -66,8 +66,6 @@ namespace VisaSponsorshipScout.API
             {
                 app.Run();
             }
-            //string url = $"http://0.0.0.0:8080";
-            //app.Run();
         }
     }
 }

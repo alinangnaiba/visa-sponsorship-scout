@@ -1,4 +1,6 @@
-﻿using VisaSponsorshipScout.Infrastructure.Configuration;
+﻿using VisaSponsorshipScout.Infrastructure.CloudServices.Azure;
+using VisaSponsorshipScout.Infrastructure.CloudServices.Google;
+using VisaSponsorshipScout.Infrastructure.Configuration;
 
 namespace VisaSponsorshipScout.Infrastructure.CloudServices
 {

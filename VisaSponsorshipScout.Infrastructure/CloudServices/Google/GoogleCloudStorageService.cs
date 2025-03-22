@@ -1,7 +1,7 @@
 ﻿using Google.Cloud.Storage.V1;
 using VisaSponsorshipScout.Infrastructure.Configuration;
 
-namespace VisaSponsorshipScout.Infrastructure.CloudServices
+namespace VisaSponsorshipScout.Infrastructure.CloudServices.Google
 {
     internal class GoogleCloudStorageService : ICloudStorageService
     {

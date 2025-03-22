@@ -3,9 +3,9 @@ using Azure.Storage.Files.Shares;
 using Azure.Storage.Files.Shares.Models;
 using VisaSponsorshipScout.Infrastructure.Configuration;
 
-namespace VisaSponsorshipScout.Infrastructure.AzureServices
+namespace VisaSponsorshipScout.Infrastructure.CloudServices.Azure
 {
-    internal sealed class ShareClientFactory
+    internal sealed class AzureShareClientFactory
     {
         internal static ShareClient Create(FileStorageSettings settings)
         {

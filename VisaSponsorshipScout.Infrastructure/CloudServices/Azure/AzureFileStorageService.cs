@@ -1,9 +1,8 @@
 ﻿using Azure.Storage.Files.Shares;
 using Azure.Storage.Files.Shares.Models;
-using VisaSponsorshipScout.Infrastructure.AzureServices;
 using VisaSponsorshipScout.Infrastructure.Configuration;
 
-namespace VisaSponsorshipScout.Infrastructure.CloudServices
+namespace VisaSponsorshipScout.Infrastructure.CloudServices.Azure
 {
     internal class AzureFileStorageService : ICloudStorageService
     {
@@ -18,7 +17,7 @@ namespace VisaSponsorshipScout.Infrastructure.CloudServices
         {
             try
             {
-                var shareClient = ShareClientFactory.Create(_settings);
+                var shareClient = AzureShareClientFactory.Create(_settings);
                 ShareDirectoryClient client = shareClient.GetDirectoryClient(_settings.CertificateDirectoryName);
                 ShareFileClient file = client.GetFileClient(fileName);
                 ShareFileDownloadInfo download = file.DownloadAsync().GetAwaiter().GetResult();

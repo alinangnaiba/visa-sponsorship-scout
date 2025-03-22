@@ -53,10 +53,18 @@ namespace VisaSponsorshipScout.API
             app.UseHttpsRedirection();
             app.UseCors();
             app.UseAuthorization();
-
+            
             app.MapControllers();
-
-            app.Run();
+            
+            if (app.Environment.IsProduction())
+            {
+                string url = $"http://0.0.0.0:8530";
+                app.Run(url);
+            }
+            else
+            {
+                app.Run();
+            }
         }
     }
 }

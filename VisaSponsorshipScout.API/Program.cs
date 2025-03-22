@@ -55,18 +55,19 @@ namespace VisaSponsorshipScout.API
             app.UseAuthorization();
             
             app.MapControllers();
-            
-            //if (app.Environment.IsProduction())
-            //{
-            //    string url = $"http://0.0.0.0:8080";
-            //    app.Run(url);
-            //}
-            //else
-            //{
-            //    app.Run();
-            //}
-            string url = $"http://0.0.0.0:8080";
-            app.Run(url);
+
+            if (app.Environment.IsProduction())
+            {
+                string port = Environment.GetEnvironmentVariable("PORT") ?? "8100";
+                string url = $"http://0.0.0.0:{port}";
+                app.Run(url);
+            }
+            else
+            {
+                app.Run();
+            }
+            //string url = $"http://0.0.0.0:8080";
+            //app.Run();
         }
     }
 }

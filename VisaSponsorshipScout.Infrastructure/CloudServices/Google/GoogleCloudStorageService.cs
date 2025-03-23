@@ -12,11 +12,11 @@ namespace VisaSponsorshipScout.Infrastructure.CloudServices.Google
             _settings = settings;
         }
 
-        public byte[]? DownloadToMemory(string fileName)
+        public byte[]? DownloadToMemory(string filename)
         {
             StorageClient storage = StorageClient.Create();
             MemoryStream stream = new();
-            storage.DownloadObject(_settings.BucketName, _settings.FileName, stream);
+            storage.DownloadObject(_settings.BucketName, filename, stream);
 
             return stream.ToArray();
         }

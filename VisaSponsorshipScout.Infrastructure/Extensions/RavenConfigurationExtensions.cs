@@ -48,7 +48,7 @@ namespace VisaSponsorshipScout.Infrastructure.Extensions
             return applicationSettings;
         }
 
-        private static bool TryGetCertificateFromStorage(FileStorageSettings settings, string fileName, out X509Certificate2? certificate)
+        private static bool TryGetCertificateFromStorage(FileStorageSettings settings, out X509Certificate2? certificate)
         {
             if (!IsValidSettings(settings)) 
             {
@@ -56,7 +56,7 @@ namespace VisaSponsorshipScout.Infrastructure.Extensions
                 return false;
             }
             ICloudStorageService fileStorageService = StorageServiceFactory.Create(settings);
-            byte[]? bytes = fileStorageService.DownloadToMemory(fileName);
+            byte[]? bytes = fileStorageService.DownloadToMemory(settings.FileName);
             if (bytes is not null)
             {
                 certificate = X509CertificateLoader.LoadPkcs12(bytes.ToArray(), null);
@@ -91,7 +91,7 @@ namespace VisaSponsorshipScout.Infrastructure.Extensions
                 Urls = applicationSettings.DatabaseSettings.Urls,
                 Database = applicationSettings.DatabaseSettings.Database
             };
-            if (TryGetCertificateFromStorage(applicationSettings.FileStorage, applicationSettings.FileStorage.FileName, out certificate))
+            if (TryGetCertificateFromStorage(applicationSettings.FileStorage, out certificate))
             {
                 store.Certificate = certificate;
             }

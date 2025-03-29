@@ -31,8 +31,8 @@ namespace VisaSponsorshipScout.API.Controllers
             return Ok(result.ToModel());
         }
 
-        [HttpGet("county/{county}/page/{page}")]
-        public async Task<IActionResult> GetByCountyPaged(string county, int page)
+        [HttpGet("county/{county}")]
+        public async Task<IActionResult> GetByCountyPaged(string county, [FromQuery] int page)
         {
             var result = await _dataRetriever.GetOrganisationByCountyAsync(county, page);
             if (result.Data.Count == 0)
@@ -42,8 +42,8 @@ namespace VisaSponsorshipScout.API.Controllers
             return Ok(result.ToModel());
         }
 
-        [HttpGet("town-or-city/{townOrCity}/page/{page}")]
-        public async Task<IActionResult> GetByTownOrCityPaged(string townOrCity, int page)
+        [HttpGet("town-or-city/{townOrCity}")]
+        public async Task<IActionResult> GetByTownOrCityPaged(string townOrCity, [FromQuery] int page)
         {
             var result = await _dataRetriever.GetOrganisationByTownCityAsync(townOrCity, page);
             if (result.Data.Count == 0)
@@ -54,8 +54,8 @@ namespace VisaSponsorshipScout.API.Controllers
             return Ok(resultModel);
         }
 
-        [HttpGet("name/{name}/page/{page}")]
-        public async Task<IActionResult> GetByNamePaged(string name, int page)
+        [HttpGet("name/{name}")]
+        public async Task<IActionResult> GetByNamePaged(string name, [FromQuery] int page)
         {
             var result = await _dataRetriever.GetOrganisationByNameAsync(name, page);
             if (result.Data.Count == 0)

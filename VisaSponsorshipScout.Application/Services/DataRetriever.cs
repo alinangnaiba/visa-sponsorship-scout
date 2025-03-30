@@ -19,7 +19,7 @@ namespace VisaSponsorshipScout.Application.Services
 
     public class DataRetriever : IDataRetriever
     {
-        const int _pageSize = 10;
+        const int _pageSize = 20;
         private readonly IAsyncDocumentSession _session;
 
         public DataRetriever(IAsyncDocumentSession session)
@@ -30,7 +30,6 @@ namespace VisaSponsorshipScout.Application.Services
         public async Task<PagedResult<DuplicteResponse>> GetDuplicates()
         {
             var result = new PagedResult<DuplicteResponse>();
-            var query = _session.Query<Organisation>();
             var nameGroups = await _session.Query<Organisation>()
             .GroupBy(x => x.Name)
             .Select(g => new DuplicteResponse

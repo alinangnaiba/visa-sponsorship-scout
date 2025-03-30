@@ -9,6 +9,8 @@ using Raven.Client.Documents.Linq;
 using System.Collections.Concurrent;
 using System.Globalization;
 using VisaSponsorshipScout.Core.Entities;
+using Raven.Client.Documents.BulkInsert;
+using Raven.Client.Documents.Session;
 
 namespace VisaSponsorshipScout.Application.Services
 {
@@ -34,7 +36,7 @@ namespace VisaSponsorshipScout.Application.Services
             var semaphore = new SemaphoreSlim(_maxParallel);
             int total = 0;
             var session = _documentStore.OpenAsyncSession();
-            var existingOrgs = (await session.Query<Organisation>().ToListAsync()).ToConcurrentDictionary(org => org.Name);
+            var existingOrgs = (await GetOrganisationsFromStreamAsync(session)).ToConcurrentDictionary(org => org.Name);
             var readTask = Task.Run(() => ReadCsv(file, recordQueue));
                         
             var tasks = new List<Task>();
@@ -50,6 +52,21 @@ namespace VisaSponsorshipScout.Application.Services
             await Task.WhenAll(tasks);
             await session.SaveChangesAsync();
             return total;
+        }
+
+        private async Task<List<Organisation>> GetOrganisationsFromStreamAsync(IAsyncDocumentSession session)
+        {
+            List<Organisation> organisations = new();
+            var query = session.Query<Organisation>();
+            await using (var stream = await session.Advanced.StreamAsync(query))
+            {
+                while (await stream.MoveNextAsync())
+                {
+                    var entity = stream.Current.Document;
+                    organisations.Add(entity);
+                }
+            }
+            return organisations;
         }
 
         private async Task ProcessBatchAsync(ConcurrentQueue<Organisation> recordQueue, ConcurrentDictionary<string, Organisation> existingOrgs, SemaphoreSlim semaphore, Func<int> increment)
@@ -92,10 +109,7 @@ namespace VisaSponsorshipScout.Application.Services
             {
                 return;
             }
-            var names = batch.Select(x => x.Name.Trim()).ToList();
-            var session = _documentStore.OpenAsyncSession();
-            var bulkInsert = _documentStore.BulkInsert();
-
+            using BulkInsertOperation bulkInsert = _documentStore.BulkInsert();
             foreach (var org in batch)
             {
                 org.Id = Guid.NewGuid().ToString();

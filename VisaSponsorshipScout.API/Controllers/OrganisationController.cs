@@ -6,6 +6,9 @@ using VisaSponsorshipScout.Core.Enums;
 
 namespace VisaSponsorshipScout.API.Controllers
 {
+    //TODO: DELETE THIS FILE
+    //No longer used since the introduction of FastEndpoints
+    //keeping it for now for reference
     [ApiController]
     [Route("api/[controller]")]
     public class OrganisationController : ControllerBase

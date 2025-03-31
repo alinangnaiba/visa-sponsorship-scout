@@ -1,4 +1,4 @@
-﻿namespace VisaSponsorshipScout.API.ResultModels
+﻿namespace VisaSponsorshipScout.API.Endpoints.Organisation
 {
     public class OrganisationResultModel
     {

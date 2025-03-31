@@ -4,7 +4,7 @@ namespace VisaSponsorshipScout.Application.Adapters
 {
     public static class WorkerRoutes
     {
-        private static  Dictionary<int, string> _routes = new Dictionary<int, string>
+        private static Dictionary<int, string> _routes = new Dictionary<int, string>
         {
             { (int)RouteEnum.CharityWorker, "Charity Worker" },
             { (int)RouteEnum.CreativeWorker, "Creative Worker" },

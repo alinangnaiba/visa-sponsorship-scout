@@ -2,8 +2,14 @@
 {
     internal class ApplicationSettings
     {
-        public FileStorageSettings FileStorage { get; set; } = new FileStorageSettings();
         public DatabaseSettings DatabaseSettings { get; set; } = new DatabaseSettings();
+        public FileStorageSettings FileStorage { get; set; } = new FileStorageSettings();
+    }
+
+    internal class DatabaseSettings
+    {
+        public string Database { get; set; }
+        public string[] Urls { get; set; }
     }
 
     internal class FileStorageSettings
@@ -15,11 +21,5 @@
         public string FileName { get; set; }
         public string ShareName { get; set; }
         public string Uri { get; set; }
-    }
-
-    internal class DatabaseSettings
-    {
-        public string Database { get; set; }
-        public string[] Urls { get; set; }
     }
 }

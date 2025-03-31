@@ -1,6 +1,6 @@
 ﻿namespace VisaSponsorshipScout.Infrastructure.CloudServices
 {
-    interface ICloudStorageService
+    internal interface ICloudStorageService
     {
         byte[]? DownloadToMemory(string fileName);
     }

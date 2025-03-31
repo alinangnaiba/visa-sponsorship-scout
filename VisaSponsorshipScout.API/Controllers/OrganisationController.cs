@@ -4,7 +4,6 @@ using VisaSponsorshipScout.Application.Adapters;
 using VisaSponsorshipScout.Application.Services;
 using VisaSponsorshipScout.Core.Enums;
 
-
 namespace VisaSponsorshipScout.API.Controllers
 {
     [ApiController]
@@ -40,6 +39,17 @@ namespace VisaSponsorshipScout.API.Controllers
             return Ok(result.ToModel());
         }
 
+        [HttpGet("name/{name}")]
+        public async Task<IActionResult> GetByNamePaged(string name, [FromQuery] int page)
+        {
+            var result = await _dataRetriever.GetOrganisationByNameAsync(name, page);
+            if (result.Data.Count == 0)
+            {
+                return NotFound(result.ToModel());
+            }
+            return Ok(result.ToModel());
+        }
+
         [HttpGet("town-or-city/{townOrCity}")]
         public async Task<IActionResult> GetByTownOrCityPaged(string townOrCity, [FromQuery] int page)
         {
@@ -52,23 +62,6 @@ namespace VisaSponsorshipScout.API.Controllers
             return Ok(resultModel);
         }
 
-        [HttpGet("name/{name}")]
-        public async Task<IActionResult> GetByNamePaged(string name, [FromQuery] int page)
-        {
-            var result = await _dataRetriever.GetOrganisationByNameAsync(name, page);
-            if (result.Data.Count == 0)
-            {
-                return NotFound(result.ToModel());
-            }
-            return Ok(result.ToModel());
-        }
-
-        [HttpGet("routes")]
-        public IActionResult GetRoutes()
-        {
-            return Ok(WorkerRoutes.GetRoutes());
-        }
-
         [HttpGet("routes/{id}")]
         public IActionResult GetRouteById(int id)
         {
@@ -78,6 +71,12 @@ namespace VisaSponsorshipScout.API.Controllers
             }
 
             return Ok(new { Data = value, Success = true });
+        }
+
+        [HttpGet("routes")]
+        public IActionResult GetRoutes()
+        {
+            return Ok(WorkerRoutes.GetRoutes());
         }
     }
 }

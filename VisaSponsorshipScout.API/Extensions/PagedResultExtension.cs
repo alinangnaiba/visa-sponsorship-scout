@@ -1,4 +1,4 @@
-﻿using VisaSponsorshipScout.API.ResultModels;
+﻿using VisaSponsorshipScout.API.Endpoints.Organisation;
 using VisaSponsorshipScout.Core.Entities;
 using VisaSponsorshipScout.Core.Models;
 

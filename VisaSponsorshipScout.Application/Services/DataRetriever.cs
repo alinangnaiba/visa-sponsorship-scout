@@ -14,7 +14,7 @@ namespace VisaSponsorshipScout.Application.Services
 
         Task<PagedResult<Organisation>> GetOrganisationByCountyAsync(string county, int page);
 
-        Task<PagedResult<Organisation>> GetOrganisationByNameAsync(string townOrCity, int page);
+        Task<PagedResult<Organisation>> GetOrganisationByNameAsync(string name, int page);
 
         Task<PagedResult<Organisation>> GetOrganisationByTownCityAsync(string townOrCity, int page);
 

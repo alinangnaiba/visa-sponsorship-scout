@@ -1,25 +1,29 @@
-﻿using VisaSponsorshipScout.Application.Dto;
-using Raven.Client.Documents;
+﻿using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
 using Raven.Client.Documents.Session;
 using System.Linq.Expressions;
-using VisaSponsorshipScout.Core.Models;
+using VisaSponsorshipScout.Application.Dto;
 using VisaSponsorshipScout.Core.Entities;
+using VisaSponsorshipScout.Core.Models;
 
 namespace VisaSponsorshipScout.Application.Services
 {
     public interface IDataRetriever
     {
         Task<PagedResult<DuplicteResponse>> GetDuplicates();
-        Task<PagedResult<Organisation>> GetOrganisationListAsync(int page);
+
         Task<PagedResult<Organisation>> GetOrganisationByCountyAsync(string county, int page);
-        Task<PagedResult<Organisation>> GetOrganisationByTownCityAsync(string townOrCity, int page);
+
         Task<PagedResult<Organisation>> GetOrganisationByNameAsync(string townOrCity, int page);
+
+        Task<PagedResult<Organisation>> GetOrganisationByTownCityAsync(string townOrCity, int page);
+
+        Task<PagedResult<Organisation>> GetOrganisationListAsync(int page);
     }
 
     public class DataRetriever : IDataRetriever
     {
-        const int _pageSize = 20;
+        private const int _pageSize = 20;
         private readonly IAsyncDocumentSession _session;
 
         public DataRetriever(IAsyncDocumentSession session)

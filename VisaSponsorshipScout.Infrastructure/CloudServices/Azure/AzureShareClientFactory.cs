@@ -14,7 +14,7 @@ namespace VisaSponsorshipScout.Infrastructure.CloudServices.Azure
                 ShareTokenIntent = ShareTokenIntent.Backup
             };
 
-            var shareClient = string.IsNullOrWhiteSpace(settings.ConnectionString) ? 
+            var shareClient = string.IsNullOrWhiteSpace(settings.ConnectionString) ?
                 new ShareClient(new Uri($"{settings.Uri}/{settings.ShareName}"), new DefaultAzureCredential(), shareOptions) :
                 new ShareClient(settings.ConnectionString, settings.ShareName); //local
 

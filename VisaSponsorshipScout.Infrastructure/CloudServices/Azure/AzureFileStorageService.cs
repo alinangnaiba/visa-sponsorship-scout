@@ -8,7 +8,7 @@ namespace VisaSponsorshipScout.Infrastructure.CloudServices.Azure
     {
         private readonly FileStorageSettings _settings;
 
-        internal AzureFileStorageService(FileStorageSettings settings) 
+        internal AzureFileStorageService(FileStorageSettings settings)
         {
             _settings = settings;
         }
@@ -30,7 +30,7 @@ namespace VisaSponsorshipScout.Infrastructure.CloudServices.Azure
             catch (Exception)
             {
                 throw;
-            }            
+            }
         }
     }
 }

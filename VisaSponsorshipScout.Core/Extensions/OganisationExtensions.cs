@@ -10,7 +10,7 @@ namespace VisaSponsorshipScout.Core.Extensions
             {
                 return false;
             }
-            
+
             var hasUpdate = self.Name == other.Name &&
                 self.TypeAndRatings == other.TypeAndRatings &&
                 self.County == other.County &&

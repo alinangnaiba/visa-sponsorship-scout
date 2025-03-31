@@ -1,12 +1,11 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using VisaSponsorshipScout.Infrastructure.Configuration;
 using Raven.Client.Documents;
 using Raven.Client.ServerWide;
 using Raven.Client.ServerWide.Operations;
 using System.Security.Cryptography.X509Certificates;
 using VisaSponsorshipScout.Infrastructure.CloudServices;
-using System.IO;
+using VisaSponsorshipScout.Infrastructure.Configuration;
 
 namespace VisaSponsorshipScout.Infrastructure.Extensions
 {
@@ -35,52 +34,6 @@ namespace VisaSponsorshipScout.Infrastructure.Extensions
             });
 
             return services;
-        }
-
-        private static ApplicationSettings GetSettings(IConfiguration configuration)
-        {
-            var applicationSettings = new ApplicationSettings();            
-            var databaseConfig = configuration.GetSection(nameof(DatabaseSettings));
-            var fileStorageConfig = configuration.GetSection(nameof(FileStorageSettings));
-            applicationSettings.DatabaseSettings = databaseConfig.Get<DatabaseSettings>();
-            applicationSettings.FileStorage = fileStorageConfig.Get<FileStorageSettings>();
-
-            return applicationSettings;
-        }
-
-        private static bool TryGetCertificateFromStorage(FileStorageSettings settings, out X509Certificate2? certificate)
-        {
-            if (!IsValidSettings(settings)) 
-            {
-                certificate = null;
-                return false;
-            }
-            ICloudStorageService fileStorageService = StorageServiceFactory.Create(settings);
-            byte[]? bytes = fileStorageService.DownloadToMemory(settings.FileName);
-            if (bytes is not null)
-            {
-                certificate = X509CertificateLoader.LoadPkcs12(bytes.ToArray(), null);
-                return true;
-            }
-            else
-            {
-                certificate = null;
-                return false;
-            }
-        }
-
-        private static bool IsValidSettings(FileStorageSettings settings)
-        {
-            if (settings is null)
-            {
-                return false;
-            }
-            if (settings.CloudService is "Azure")
-            {
-                return !string.IsNullOrWhiteSpace(settings.CertificateDirectoryName) && !string.IsNullOrWhiteSpace(settings.ShareName) && !string.IsNullOrWhiteSpace(settings.FileName); ;
-            }
-            
-            return !string.IsNullOrWhiteSpace(settings.BucketName) && !string.IsNullOrWhiteSpace(settings.FileName) && !string.IsNullOrWhiteSpace(settings.FileName);
         }
 
         private static DocumentStore CreateDocumentStore(ApplicationSettings applicationSettings)
@@ -115,6 +68,52 @@ namespace VisaSponsorshipScout.Infrastructure.Extensions
             catch (Exception ex)
             {
                 throw new Exception($"Failed to create/verify database: {dbName}", ex);
+            }
+        }
+
+        private static ApplicationSettings GetSettings(IConfiguration configuration)
+        {
+            var applicationSettings = new ApplicationSettings();
+            var databaseConfig = configuration.GetSection(nameof(DatabaseSettings));
+            var fileStorageConfig = configuration.GetSection(nameof(FileStorageSettings));
+            applicationSettings.DatabaseSettings = databaseConfig.Get<DatabaseSettings>();
+            applicationSettings.FileStorage = fileStorageConfig.Get<FileStorageSettings>();
+
+            return applicationSettings;
+        }
+
+        private static bool IsValidSettings(FileStorageSettings settings)
+        {
+            if (settings is null)
+            {
+                return false;
+            }
+            if (settings.CloudService is "Azure")
+            {
+                return !string.IsNullOrWhiteSpace(settings.CertificateDirectoryName) && !string.IsNullOrWhiteSpace(settings.ShareName) && !string.IsNullOrWhiteSpace(settings.FileName); ;
+            }
+
+            return !string.IsNullOrWhiteSpace(settings.BucketName) && !string.IsNullOrWhiteSpace(settings.FileName) && !string.IsNullOrWhiteSpace(settings.FileName);
+        }
+
+        private static bool TryGetCertificateFromStorage(FileStorageSettings settings, out X509Certificate2? certificate)
+        {
+            if (!IsValidSettings(settings))
+            {
+                certificate = null;
+                return false;
+            }
+            ICloudStorageService fileStorageService = StorageServiceFactory.Create(settings);
+            byte[]? bytes = fileStorageService.DownloadToMemory(settings.FileName);
+            if (bytes is not null)
+            {
+                certificate = X509CertificateLoader.LoadPkcs12(bytes.ToArray(), null);
+                return true;
+            }
+            else
+            {
+                certificate = null;
+                return false;
             }
         }
     }

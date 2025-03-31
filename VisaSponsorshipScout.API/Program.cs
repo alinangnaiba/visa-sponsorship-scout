@@ -52,7 +52,7 @@ namespace VisaSponsorshipScout.API
             app.UseHttpsRedirection();
             app.UseCors();
             app.UseAuthorization();
-            
+
             app.MapControllers();
 
             if (app.Environment.IsProduction())

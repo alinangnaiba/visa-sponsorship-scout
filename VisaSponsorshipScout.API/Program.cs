@@ -32,7 +32,6 @@ namespace VisaSponsorshipScout.API
                     });
             });
 
-            builder.Services.AddScoped<IDataUploader, DataUploader>();
             builder.Services.AddScoped<IDataRetriever, DataRetriever>();
 
             builder.Services.AddRouting(options => options.LowercaseUrls = true);

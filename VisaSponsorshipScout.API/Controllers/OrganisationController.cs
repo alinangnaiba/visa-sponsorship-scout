@@ -12,12 +12,10 @@ namespace VisaSponsorshipScout.API.Controllers
     public class OrganisationController : ControllerBase
     {
         private readonly IDataRetriever _dataRetriever;
-        private readonly IDataUploader _dataUploader;
 
-        public OrganisationController(IDataRetriever dataRetriever, IDataUploader dataUploader)
+        public OrganisationController(IDataRetriever dataRetriever)
         {
             _dataRetriever = dataRetriever;
-            _dataUploader = dataUploader;
         }
 
         [HttpGet("{page}")]
@@ -80,20 +78,6 @@ namespace VisaSponsorshipScout.API.Controllers
             }
 
             return Ok(new { Data = value, Success = true });
-        }
-
-        //TODO: deprecate
-        [HttpPost("upload")]
-        [Consumes("multipart/form-data")]
-        public async Task<IActionResult> Post(IFormFile file)
-        {
-            if (file == null || !Path.GetExtension(file.FileName).Equals(".csv", StringComparison.CurrentCultureIgnoreCase))
-            {
-                return BadRequest("Invalid file uploaded.");
-            }
-
-            var totalChanges = await _dataUploader.SaveAsync(file);
-            return Ok($"Total changes: {totalChanges}");
         }
     }
 }

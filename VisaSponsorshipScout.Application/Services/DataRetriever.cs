@@ -102,7 +102,6 @@ namespace VisaSponsorshipScout.Application.Services
 
         private async Task<PagedResult<Organisation>> SearchAsync(string keyword, int page)
         {
-            throw new NullReferenceException("Error somewhere here");
             var result = new PagedResult<Organisation>();
             var query = _session.Query<Organisation>();
             query = query.Search(org => org.Name, keyword);

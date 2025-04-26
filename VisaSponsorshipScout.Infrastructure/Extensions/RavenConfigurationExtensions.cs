@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Raven.Client.Documents;
 using Raven.Client.ServerWide;
 using Raven.Client.ServerWide.Operations;
+using Serilog;
 using System.Security.Cryptography.X509Certificates;
 using VisaSponsorshipScout.Infrastructure.CloudServices;
 using VisaSponsorshipScout.Infrastructure.Configuration;
@@ -11,6 +12,8 @@ namespace VisaSponsorshipScout.Infrastructure.Extensions
 {
     public static class RavenConfigurationExtensions
     {
+        private static readonly ILogger _logger = Log.ForContext(typeof(RavenConfigurationExtensions));
+
         public static IServiceCollection ConfigureDatabase(this IServiceCollection services, IConfiguration configuration)
         {
             var applicationSettings = GetSettings(configuration);
@@ -44,11 +47,14 @@ namespace VisaSponsorshipScout.Infrastructure.Extensions
                 Urls = applicationSettings.DatabaseSettings.Urls,
                 Database = applicationSettings.DatabaseSettings.Database
             };
+            
             if (TryGetCertificateFromStorage(applicationSettings.FileStorage, out certificate))
             {
                 store.Certificate = certificate;
             }
+            
             store.Initialize();
+            
             EnsureDatabaseExists(store, applicationSettings.DatabaseSettings.Database);
 
             return store;
@@ -67,6 +73,7 @@ namespace VisaSponsorshipScout.Infrastructure.Extensions
             }
             catch (Exception ex)
             {
+                _logger.Error(ex, "Failed to create/verify database: {DatabaseName}", dbName);
                 throw new Exception($"Failed to create/verify database: {dbName}", ex);
             }
         }
@@ -90,10 +97,13 @@ namespace VisaSponsorshipScout.Infrastructure.Extensions
             }
             if (settings.CloudService is "Azure")
             {
-                return !string.IsNullOrWhiteSpace(settings.CertificateDirectoryName) && !string.IsNullOrWhiteSpace(settings.ShareName) && !string.IsNullOrWhiteSpace(settings.FileName); ;
+                return !string.IsNullOrWhiteSpace(settings.CertificateDirectoryName) && 
+                       !string.IsNullOrWhiteSpace(settings.ShareName) && 
+                       !string.IsNullOrWhiteSpace(settings.FileName);
             }
 
-            return !string.IsNullOrWhiteSpace(settings.BucketName) && !string.IsNullOrWhiteSpace(settings.FileName) && !string.IsNullOrWhiteSpace(settings.FileName);
+            return !string.IsNullOrWhiteSpace(settings.BucketName) && 
+                   !string.IsNullOrWhiteSpace(settings.FileName);
         }
 
         private static bool TryGetCertificateFromStorage(FileStorageSettings settings, out X509Certificate2? certificate)
@@ -103,15 +113,26 @@ namespace VisaSponsorshipScout.Infrastructure.Extensions
                 certificate = null;
                 return false;
             }
-            ICloudStorageService fileStorageService = StorageServiceFactory.Create(settings);
-            byte[]? bytes = fileStorageService.DownloadToMemory(settings.FileName);
-            if (bytes is not null)
+            
+            try
             {
-                certificate = X509CertificateLoader.LoadPkcs12(bytes.ToArray(), null);
-                return true;
+                ICloudStorageService fileStorageService = StorageServiceFactory.Create(settings);
+                    
+                byte[]? bytes = fileStorageService.DownloadToMemory(settings.FileName);
+                if (bytes is not null)
+                {
+                    certificate = X509CertificateLoader.LoadPkcs12(bytes.ToArray(), null);
+                    return true;
+                }
+                else
+                {
+                    certificate = null;
+                    return false;
+                }
             }
-            else
+            catch (Exception ex)
             {
+                _logger.Error(ex, "Error retrieving certificate from storage");
                 certificate = null;
                 return false;
             }

@@ -1,4 +1,5 @@
-﻿using Raven.Client.Documents;
+﻿using Microsoft.Extensions.Logging;
+using Raven.Client.Documents;
 using Raven.Client.Documents.Linq;
 using Raven.Client.Documents.Session;
 using System.Linq.Expressions;
@@ -35,20 +36,23 @@ namespace VisaSponsorshipScout.Application.Services
         {
             var result = new PagedResult<DuplicteResponse>();
             var nameGroups = await _session.Query<Organisation>()
-            .GroupBy(x => x.Name)
-            .Select(g => new DuplicteResponse
-            {
-                Name = g.Key,
-                Count = g.Count()
-            }).ToListAsync();
+                .GroupBy(x => x.Name)
+                .Select(g => new DuplicteResponse
+                {
+                    Name = g.Key,
+                    Count = g.Count()
+                }).ToListAsync();
+
             var data = nameGroups
             .Where(x => x.Count > 1)
             .ToList();
+
             result.Data = data;
-            result.TotalResult = result.Data.Count;
+            result.TotalItems = result.Data.Count;
             result.PageSize = _pageSize;
             result.CurrentPage = 1;
-            result.TotalPages = (int)Math.Ceiling((double)result.TotalResult / _pageSize);
+            result.TotalPages = (int)Math.Ceiling((double)result.TotalItems / _pageSize);
+
             return result;
         }
 
@@ -80,7 +84,8 @@ namespace VisaSponsorshipScout.Application.Services
             {
                 query = query.Where(predicate);
             }
-            result.TotalResult = await query.CountAsync();
+
+            result.TotalItems = await query.CountAsync();
             result.Data = await query
                 .Statistics(out var stats)
                 .Skip((page - 1) * _pageSize)
@@ -90,17 +95,19 @@ namespace VisaSponsorshipScout.Application.Services
 
             result.PageSize = _pageSize;
             result.CurrentPage = page;
-            result.TotalPages = (int)Math.Ceiling((double)result.TotalResult / _pageSize);
+            result.TotalPages = (int)Math.Ceiling((double)result.TotalItems / _pageSize);
 
             return result;
         }
 
         private async Task<PagedResult<Organisation>> SearchAsync(string keyword, int page)
         {
+            throw new NullReferenceException("Error somewhere here");
             var result = new PagedResult<Organisation>();
             var query = _session.Query<Organisation>();
             query = query.Search(org => org.Name, keyword);
-            result.TotalResult = await query.CountAsync();
+
+            result.TotalItems = await query.CountAsync();
             result.Data = await query
                 .Statistics(out var stats)
                 .Skip((page - 1) * _pageSize)
@@ -110,7 +117,7 @@ namespace VisaSponsorshipScout.Application.Services
 
             result.PageSize = _pageSize;
             result.CurrentPage = page;
-            result.TotalPages = (int)Math.Ceiling((double)result.TotalResult / _pageSize);
+            result.TotalPages = (int)Math.Ceiling((double)result.TotalItems / _pageSize);
 
             return result;
         }

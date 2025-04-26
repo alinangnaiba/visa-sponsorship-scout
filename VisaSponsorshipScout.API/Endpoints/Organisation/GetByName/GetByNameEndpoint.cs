@@ -1,17 +1,20 @@
 ﻿using FastEndpoints;
+using VisaSponsorshipScout.API.Common;
 using VisaSponsorshipScout.API.Extensions;
 using VisaSponsorshipScout.Application.Services;
 using VisaSponsorshipScout.Core.Models;
 
 namespace VisaSponsorshipScout.API.Endpoints.Organisation.GetByName
 {
-    public class GetByNameEndpoint : Endpoint<GetOrganisationRequest, PagedResult<OrganisationResultModel>>
+    public class GetByNameEndpoint : Endpoint<GetOrganisationRequest, ApiResult<PagedResult<OrganisationResultModel>>>
     {
         private readonly IDataRetriever _dataRetriever;
+        private readonly ILogger<GetByNameEndpoint> _logger;
 
-        public GetByNameEndpoint(IDataRetriever dataRetriever)
+        public GetByNameEndpoint(ILogger<GetByNameEndpoint> logger, IDataRetriever dataRetriever)
         {
             _dataRetriever = dataRetriever;
+            _logger = logger;
         }
 
         public override void Configure()
@@ -22,15 +25,22 @@ namespace VisaSponsorshipScout.API.Endpoints.Organisation.GetByName
 
         public override async Task HandleAsync(GetOrganisationRequest req, CancellationToken ct)
         {
-            var result = await _dataRetriever.GetOrganisationByNameAsync(req.Keyword, req.Page);
-
-            if (result.Data.Count == 0)
+            try
             {
-                await SendNotFoundAsync(ct);
-                return;
-            }
+                var result = await _dataRetriever.GetOrganisationByNameAsync(req.Keyword, req.Page);
+                if (result.Data.Count == 0)
+                {
+                    await SendAsync(ApiResult<PagedResult<OrganisationResultModel>>.Fail("No organisation found"), StatusCodes.Status404NotFound, ct);
+                    return;
+                }
 
-            await SendOkAsync(result.ToModel(), ct);
+                await SendOkAsync(ApiResult<PagedResult<OrganisationResultModel>>.Ok(result.ToModel()), ct);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error searching for organisations with name containing '{Keyword}'", req.Keyword);
+                await SendAsync(ApiResult<PagedResult<OrganisationResultModel>>.Fail("Cannot complete request. Try again later"), StatusCodes.Status500InternalServerError, ct);
+            }
         }
     }
 }

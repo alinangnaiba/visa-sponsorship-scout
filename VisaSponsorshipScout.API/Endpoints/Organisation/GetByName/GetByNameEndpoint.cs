@@ -6,7 +6,7 @@ using VisaSponsorshipScout.Core.Models;
 
 namespace VisaSponsorshipScout.API.Endpoints.Organisation.GetByName
 {
-    public class GetByNameEndpoint : Endpoint<GetOrganisationRequest, ApiResult<PagedResult<OrganisationResultModel>>>
+    public class GetByNameEndpoint : Endpoint<GetOrganisationRequest, ApiResponse<PagedResult<OrganisationResultModel>>>
     {
         private readonly IDataRetriever _dataRetriever;
         private readonly ILogger<GetByNameEndpoint> _logger;
@@ -30,16 +30,16 @@ namespace VisaSponsorshipScout.API.Endpoints.Organisation.GetByName
                 var result = await _dataRetriever.GetOrganisationByNameAsync(req.Keyword, req.Page);
                 if (result.Data.Count == 0)
                 {
-                    await SendAsync(ApiResult<PagedResult<OrganisationResultModel>>.Fail("No organisation found"), StatusCodes.Status404NotFound, ct);
+                    await SendAsync(ApiResponse<PagedResult<OrganisationResultModel>>.Fail("No organisation found"), StatusCodes.Status404NotFound, ct);
                     return;
                 }
 
-                await SendOkAsync(ApiResult<PagedResult<OrganisationResultModel>>.Ok(result.ToModel()), ct);
+                await SendOkAsync(ApiResponse<PagedResult<OrganisationResultModel>>.Ok(result.ToModel()), ct);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error searching for organisations with name containing '{Keyword}'", req.Keyword);
-                await SendAsync(ApiResult<PagedResult<OrganisationResultModel>>.Fail("Cannot complete request. Try again later"), StatusCodes.Status500InternalServerError, ct);
+                await SendAsync(ApiResponse<PagedResult<OrganisationResultModel>>.Fail("Cannot complete request. Try again later"), StatusCodes.Status500InternalServerError, ct);
             }
         }
     }

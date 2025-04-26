@@ -1,25 +1,24 @@
 ﻿namespace VisaSponsorshipScout.API.Common
 {
-    public class ApiResult<T>
+    public class ApiResponse<T>
     {
         public bool Success { get; private set; }
-
-        public T Data { get; private set; }
+        public T Result { get; private set; }
 
         public string ErrorMessage { get; private set; } = string.Empty;
 
-        public static ApiResult<T> Ok(T data)
+        public static ApiResponse<T> Ok(T data)
         {
-            return new ApiResult<T>
+            return new ApiResponse<T>
             {
                 Success = true,
-                Data = data
+                Result = data
             };
         }
 
-        public static ApiResult<T> Fail(string errorMessage)
+        public static ApiResponse<T> Fail(string errorMessage)
         {
-            return new ApiResult<T>
+            return new ApiResponse<T>
             {
                 Success = false,
                 ErrorMessage = errorMessage
@@ -27,34 +26,34 @@
         }
     }
 
-    public class ApiResult
+    public class ApiResponse
     {
         public bool Success { get; private set; }
 
         public string ErrorMessage { get; private set; } = string.Empty;
 
-        public static ApiResult Ok()
+        public static ApiResponse Ok()
         {
-            return new ApiResult
+            return new ApiResponse
             {
                 Success = true,
             };
         }
 
-        public static ApiResult Fail(string errorMessage)
+        public static ApiResponse Fail(string errorMessage)
         {
-            return new ApiResult
+            return new ApiResponse
             {
                 Success = false,
                 ErrorMessage = errorMessage
             };
         }
 
-        public ApiResult<T> WithData<T>(T data)
+        public ApiResponse<T> WithData<T>(T data)
         {
             return Success
-                ? ApiResult<T>.Ok(data)
-                : ApiResult<T>.Fail(ErrorMessage);
+                ? ApiResponse<T>.Ok(data)
+                : ApiResponse<T>.Fail(ErrorMessage);
         }
     }
 }

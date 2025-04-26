@@ -1,11 +1,12 @@
 ﻿using FastEndpoints;
+using VisaSponsorshipScout.API.Common;
 using VisaSponsorshipScout.API.Extensions;
 using VisaSponsorshipScout.Application.Services;
 using VisaSponsorshipScout.Core.Models;
 
 namespace VisaSponsorshipScout.API.Endpoints.Organisation.GetByCounty
 {
-    public class GetByCountyEndpoint : Endpoint<GetOrganisationRequest, PagedResult<OrganisationResultModel>>
+    public class GetByCountyEndpoint : Endpoint<GetOrganisationRequest, ApiResponse<PagedResult<OrganisationResultModel>>>
     {
         private readonly IDataRetriever _dataRetriever;
         private readonly ILogger<GetByCountyEndpoint> _logger;
@@ -30,16 +31,16 @@ namespace VisaSponsorshipScout.API.Endpoints.Organisation.GetByCounty
 
                 if (result.Data.Count == 0)
                 {
-                    await SendNotFoundAsync(ct);
+                    await SendAsync(ApiResponse<PagedResult<OrganisationResultModel>>.Fail("No organisation found"), StatusCodes.Status404NotFound, ct);
                     return;
                 }
 
-                await SendOkAsync(result.ToModel(), ct);
+                await SendOkAsync(ApiResponse<PagedResult<OrganisationResultModel>>.Ok(result.ToModel()), ct);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error retrieving organisations for county '{County}'", req.Keyword);
-                throw;
+                await SendAsync(ApiResponse<PagedResult<OrganisationResultModel>>.Fail("Cannot complete request. Try again later"), StatusCodes.Status500InternalServerError, ct);
             }
         }
     }

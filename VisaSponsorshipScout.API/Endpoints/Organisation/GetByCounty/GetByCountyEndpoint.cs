@@ -8,10 +8,12 @@ namespace VisaSponsorshipScout.API.Endpoints.Organisation.GetByCounty
     public class GetByCountyEndpoint : Endpoint<GetOrganisationRequest, PagedResult<OrganisationResultModel>>
     {
         private readonly IDataRetriever _dataRetriever;
+        private readonly ILogger<GetByCountyEndpoint> _logger;
 
-        public GetByCountyEndpoint(IDataRetriever dataRetriever)
+        public GetByCountyEndpoint(ILogger<GetByCountyEndpoint> logger, IDataRetriever dataRetriever)
         {
             _dataRetriever = dataRetriever;
+            _logger = logger;
         }
 
         public override void Configure()
@@ -22,15 +24,23 @@ namespace VisaSponsorshipScout.API.Endpoints.Organisation.GetByCounty
 
         public override async Task HandleAsync(GetOrganisationRequest req, CancellationToken ct)
         {
-            var result = await _dataRetriever.GetOrganisationByCountyAsync(req.Keyword, req.Page);
-
-            if (result.Data.Count == 0)
+            try
             {
-                await SendNotFoundAsync(ct);
-                return;
-            }
+                var result = await _dataRetriever.GetOrganisationByCountyAsync(req.Keyword, req.Page);
 
-            await SendOkAsync(result.ToModel(), ct);
+                if (result.Data.Count == 0)
+                {
+                    await SendNotFoundAsync(ct);
+                    return;
+                }
+
+                await SendOkAsync(result.ToModel(), ct);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving organisations for county '{County}'", req.Keyword);
+                throw;
+            }
         }
     }
 }

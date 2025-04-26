@@ -8,10 +8,12 @@ namespace VisaSponsorshipScout.API.Endpoints.Organisation
     public class GetAllEndpoint : Endpoint<GetOrganisationPagedRequest, PagedResult<OrganisationResultModel>>
     {
         private readonly IDataRetriever _dataRetriever;
+        private readonly ILogger<GetAllEndpoint> _logger;
 
-        public GetAllEndpoint(IDataRetriever dataRetriever)
+        public GetAllEndpoint(ILogger<GetAllEndpoint> logger, IDataRetriever dataRetriever)
         {
             _dataRetriever = dataRetriever;
+            _logger = logger;
         }
 
         public override void Configure()
@@ -22,15 +24,23 @@ namespace VisaSponsorshipScout.API.Endpoints.Organisation
 
         public override async Task HandleAsync(GetOrganisationPagedRequest req, CancellationToken ct)
         {
-            var result = await _dataRetriever.GetOrganisationListAsync(req.Page);
-
-            if (result.Data.Count == 0)
+            try
             {
-                await SendNotFoundAsync(ct);
-                return;
-            }
+                var result = await _dataRetriever.GetOrganisationListAsync(req.Page);
 
-            await SendOkAsync(result.ToModel(), ct);
+                if (result.Data.Count == 0)
+                {
+                    await SendNotFoundAsync(ct);
+                    return;
+                }
+
+                await SendOkAsync(result.ToModel(), ct);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving all organisations");
+                throw;
+            }
         }
     }
 }

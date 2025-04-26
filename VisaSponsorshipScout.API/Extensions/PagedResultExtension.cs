@@ -14,7 +14,7 @@ namespace VisaSponsorshipScout.API.Extensions
                 Data = paged.Data.ToModel(),
                 PageSize = paged.PageSize,
                 TotalPages = paged.TotalPages,
-                TotalResult = paged.TotalResult
+                TotalItems = paged.TotalItems
             };
         }
 

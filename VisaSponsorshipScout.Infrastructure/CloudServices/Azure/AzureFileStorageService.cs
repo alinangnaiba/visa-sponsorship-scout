@@ -15,22 +15,15 @@ namespace VisaSponsorshipScout.Infrastructure.CloudServices.Azure
 
         public byte[]? DownloadToMemory(string fileName)
         {
-            try
-            {
-                var shareClient = AzureShareClientFactory.Create(_settings);
-                ShareDirectoryClient client = shareClient.GetDirectoryClient(_settings.CertificateDirectoryName);
-                ShareFileClient file = client.GetFileClient(fileName);
-                ShareFileDownloadInfo download = file.DownloadAsync().GetAwaiter().GetResult();
-                using MemoryStream ms = new();
-                download.Content.CopyTo(ms);
-                ms.Position = 0;
+            var shareClient = AzureShareClientFactory.Create(_settings);
+            ShareDirectoryClient client = shareClient.GetDirectoryClient(_settings.CertificateDirectoryName);
+            ShareFileClient file = client.GetFileClient(fileName);
+            ShareFileDownloadInfo download = file.DownloadAsync().GetAwaiter().GetResult();
+            using MemoryStream ms = new();
+            download.Content.CopyTo(ms);
+            ms.Position = 0;
 
-                return ms.ToArray();
-            }
-            catch (Exception)
-            {
-                throw;
-            }
+            return ms.ToArray();
         }
     }
 }

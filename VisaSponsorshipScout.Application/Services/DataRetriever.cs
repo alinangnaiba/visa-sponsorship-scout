@@ -63,7 +63,7 @@ namespace VisaSponsorshipScout.Application.Services
 
         public async Task<PagedResult<Organisation>> GetOrganisationByNameAsync(string name, int page = 1)
         {
-            return await SearchAsync(name, page);
+            return await SearchByNameAsync(name, page);
         }
 
         public async Task<PagedResult<Organisation>> GetOrganisationByTownCityAsync(string townOrCity, int page = 1)
@@ -100,13 +100,19 @@ namespace VisaSponsorshipScout.Application.Services
             return result;
         }
 
-        private async Task<PagedResult<Organisation>> SearchAsync(string keyword, int page)
+        private async Task<PagedResult<Organisation>> SearchByNameAsync(string keyword, int page)
         {
             var result = new PagedResult<Organisation>();
             var query = _session.Query<Organisation>();
-            query = query.Search(org => org.Name, keyword);
 
-            result.TotalItems = await query.CountAsync();
+            query = query.Search(org => org.Name, $"\"{keyword}\"");
+            var totalItems = await query.CountAsync();
+            if (totalItems == 0)
+            {
+                query = query.Search(org => org.Name, keyword);
+                totalItems = await query.CountAsync();
+            }
+            result.TotalItems = totalItems;
             result.Data = await query
                 .Statistics(out var stats)
                 .Skip((page - 1) * _pageSize)

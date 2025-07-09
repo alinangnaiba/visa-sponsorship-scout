@@ -30,7 +30,7 @@ namespace VisaSponsorshipScout.API.Endpoints.Organisation.GetByTownCity
                 var result = await _dataRetriever.GetOrganisationByTownCityAsync(req.Keyword, req.Page);
                 if (result.Data.Count == 0)
                 {
-                    await SendAsync(ApiResponse<PagedResult<OrganisationResultModel>>.Fail("No organisation found"), StatusCodes.Status404NotFound, ct);
+                    await SendAsync(ApiResponse<PagedResult<OrganisationResultModel>>.Fail($"No organisation found in {req.Keyword}"), StatusCodes.Status200OK, ct);
                     return;
                 }
 

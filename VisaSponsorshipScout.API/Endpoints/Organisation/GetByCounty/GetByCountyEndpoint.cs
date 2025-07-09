@@ -31,7 +31,7 @@ namespace VisaSponsorshipScout.API.Endpoints.Organisation.GetByCounty
 
                 if (result.Data.Count == 0)
                 {
-                    await SendAsync(ApiResponse<PagedResult<OrganisationResultModel>>.Fail("No organisation found"), StatusCodes.Status404NotFound, ct);
+                    await SendAsync(ApiResponse<PagedResult<OrganisationResultModel>>.Fail($"No organisation found in {req.Keyword} county"), StatusCodes.Status200OK, ct);
                     return;
                 }
 
